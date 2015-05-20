@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_uri)
                        std::exception );
     BOOST_CHECK_THROW( servus::URI uri( "8ad-schema:" ),
                        std::exception );
-    BOOST_CHECK_NO_THROW( servus::URI uri( "good-schema:" ));
+    BOOST_CHECK_NO_THROW( servus::URI uri( "g00d-sch+ma:" ));
     BOOST_CHECK_THROW( servus::URI uri( "http://host:port" ),
                        std::exception );
     BOOST_CHECK_THROW( servus::URI uri( "http://host:" ),
@@ -195,4 +195,7 @@ BOOST_AUTO_TEST_CASE(test_corner_cases)
     servus::URI uri5( "/foo#?" );
     BOOST_CHECK_EQUAL( uri5.getPath(), "/foo" );
     BOOST_CHECK_EQUAL( uri5.getFragment(), "?" );
+    servus::URI uri6( "foo://*:0" );
+    BOOST_CHECK_EQUAL( uri6.getScheme(), "foo" );
+    BOOST_CHECK_EQUAL( uri6.getHost(), "*" );
 }

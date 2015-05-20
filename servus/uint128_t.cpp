@@ -20,12 +20,12 @@
 #include "uint128_t.h"
 #include "md5/md5.hh"
 
+#include <mutex>
 #include <random>
 
+#include <cassert>
 #include <cstdlib> // for strtoull
 #include <cstring> // for strcmp
-
-#include <cassert>
 
 #ifdef _MSC_VER
 #  define strtoull _strtoui64
@@ -84,9 +84,15 @@ uint128_t make_UUID()
     while( value.high() == 0 )
     {
         static std::random_device device;
-        static std::minstd_rand engine( device( ));
-        std::uniform_int_distribution< uint64_t > generator(
+        static std::mt19937_64 engine( device( ));
+        static std::uniform_int_distribution< uint64_t > generator(
             0, std::numeric_limits<uint64_t>::max());
+        // The static state is hidden to users, so the function is made
+        // thread safe for robustness over performance.
+        // Also, creating a new generator each call seems to increases the
+        // chances of collissions up to a noticeable level.
+        static std::mutex mutex;
+        std::unique_lock< std::mutex > lock( mutex );
         value.high() = generator( engine );
         value.low() = generator( engine );
     }

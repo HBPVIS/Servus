@@ -48,8 +48,6 @@ public:
         while( i-- )
         {
             const servus::uint128_t uuid = servus::make_UUID();
-            (void)uuid;
-
             {
                 // Boost.Test is not thread safe
                 std::unique_lock< std::mutex > lock( _mutex );
@@ -116,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_basic)
     BOOST_CHECK_EQUAL( fox, stringFox );
 
     std::random_device device;
-    std::minstd_rand engine( device( ));
+    std::mt19937 engine( device( ));
     std::uniform_int_distribution< uint64_t > generator;
 
     const uint16_t high = generator( engine );
@@ -143,40 +141,40 @@ BOOST_AUTO_TEST_CASE(test_perf_test)
     Thread maps[ N_THREADS ];
     std::thread threads[ N_THREADS ];
 
-    //const auto startTime = std::chrono::system_clock::now();
+    const auto startTime = std::chrono::system_clock::now();
 
     for( size_t i = 0; i < N_THREADS; ++i )
         threads[ i ] = std::thread( std::bind( &Thread::run, maps[ i ]));
     for( size_t i = 0; i < N_THREADS; ++i )
         threads[ i ].join();
-//
-//    const std::chrono::duration<double> elapsed =
-//        startTime - std::chrono::system_clock::now();
-//
-//    std::cerr << N_UUIDS * N_THREADS / elapsed.count()
-//              << " UUID generations and hash ops / ms" << std::endl;
-//
-//    TestHash& first = maps[0].hash;
-//    for( size_t i = 1; i < N_THREADS; ++i )
-//    {
-//        TestHash& current = maps[i].hash;
-//
-//        for( TestHash::const_iterator j = current.begin();
-//             j != current.end(); ++j )
-//        {
-//            servus::uint128_t uuid( j->first );
-//            BOOST_CHECK_EQUAL( uuid, j->first );
-//
-//            std::ostringstream stream;
-//            stream << uuid;
-//            uuid = stream.str();
-//            BOOST_CHECK_EQUAL( uuid, j->first );
-//
-//            // BOOST_CHECK_EQUAL fails to compile
-//            BOOST_CHECK( first.find( uuid ) == first.end( ));
-//            first[ uuid ] = true;
-//        }
-//    }
+
+    const std::chrono::duration<double> elapsed =
+        std::chrono::system_clock::now() - startTime;
+
+    std::cerr << N_UUIDS * N_THREADS / elapsed.count()
+              << " UUID generations and hash ops / ms" << std::endl;
+
+    TestHash& first = maps[0].hash;
+    for( size_t i = 1; i < N_THREADS; ++i )
+    {
+        TestHash& current = maps[i].hash;
+
+        for( TestHash::const_iterator j = current.begin();
+             j != current.end(); ++j )
+        {
+            servus::uint128_t uuid( j->first );
+            BOOST_CHECK_EQUAL( uuid, j->first );
+
+            std::ostringstream stream;
+            stream << uuid;
+            uuid = stream.str();
+            BOOST_CHECK_EQUAL( uuid, j->first );
+
+            // BOOST_CHECK_EQUAL fails to compile
+            BOOST_CHECK( first.find( uuid ) == first.end( ));
+            first[ uuid ] = true;
+        }
+    }
 }
 
 
