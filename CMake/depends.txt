@@ -1,0 +1,1 @@
+config.bluebrain https://github.com/BlueBrain/config.git master
