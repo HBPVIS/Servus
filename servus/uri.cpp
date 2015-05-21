@@ -1,11 +1,11 @@
-
-/* Copyright (c) 2013-2015, Ahmet.Bilgili@epfl.ch
+/* Copyright (c) 2013-2015, Human Brain Project
+ *                          Ahmet.Bilgili@epfl.ch
  *                    2015, Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
  * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License version 2.1 as published
+ * the terms of the GNU Lesser General Public License version 3.0 as published
  * by the Free Software Foundation.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT

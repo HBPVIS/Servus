@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2012-2015, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
