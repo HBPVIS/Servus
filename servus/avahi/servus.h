@@ -27,6 +27,7 @@
 #include <stdexcept>
 
 #include <mutex>
+#include <cassert>
 
 #define WARN std::cerr << __FILE__ << ":" << __LINE__ << ": "
 
@@ -255,9 +256,9 @@ private:
             break;
 
         case AVAHI_CLIENT_S_REGISTERING:
-            /* The server records are now being established. This might be
-             * caused by a host name change. We need to wait for our own records
-             * to register until the host name is properly esatblished. */
+            // The server records are now being established. This might be
+            // caused by a host name change. We need to wait for our own records
+            // to register until the host name is properly established.
             throw std::runtime_error( std::string( "Unimplemented: " ) +
                                       __FILE__ + ":" +
                                       std::to_string( __LINE__ ));
@@ -284,9 +285,6 @@ private:
                     const AvahiBrowserEvent event, const char* name,
                     const char* type, const char* domain )
     {
-        //LBVERB << "Browse event " << int(event) << " for "
-        //       << (name ? name : "none") << " type " <<  (type ? type : "none")
-        //       << std::endl;
         switch( event )
         {
         case AVAHI_BROWSER_FAILURE:
@@ -297,9 +295,9 @@ private:
             break;
 
         case AVAHI_BROWSER_NEW:
-            /* We ignore the returned resolver object. In the callback function
-               we free it. If the server is terminated before the callback
-               function is called the server will free the resolver for us. */
+            // We ignore the returned resolver object. In the callback function
+            // we free it. If the server is terminated before the callback
+            // function is called the server will free the resolver for us.
             if( !avahi_service_resolver_new( _client, ifIndex, protocol, name,
                                              type, domain, AVAHI_PROTO_UNSPEC,
                                              (AvahiLookupFlags)(0),
@@ -323,7 +321,6 @@ private:
         }
     }
 
-    // Resolving
     static void _resolveCBS( AvahiServiceResolver* resolver,
                              AvahiIfIndex, AvahiProtocol,
                              AvahiResolverEvent event, const char* name,
@@ -383,7 +380,6 @@ private:
         avahi_service_resolver_free( resolver );
     }
 
-    // Announcing
     void _updateRecord() final
     {
         if( _announce.empty() || !_announcable )

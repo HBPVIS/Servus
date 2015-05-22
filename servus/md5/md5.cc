@@ -47,8 +47,8 @@ documentation and/or software.
 #include <string.h>
 #include <iostream>
 
-
-
+namespace md5
+{
 
 // MD5 simple initialization method
 
@@ -549,4 +549,6 @@ inline void MD5::II(uint4& a, uint4 b, uint4 c, uint4 d, uint4 x,
 			     uint4 s, uint4 ac){
  a += I(b, c, d) + x + ac;
  a = rotate_left (a, s) +b;
+}
+
 }

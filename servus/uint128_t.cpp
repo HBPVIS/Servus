@@ -71,7 +71,7 @@ uint128_t& uint128_t::operator = ( const std::string& from )
 
 uint128_t make_uint128( const char* string )
 {
-    const MD5 md5( (unsigned char*)string );
+    const md5::MD5 md5( (unsigned char*)string );
     uint128_t value;
     md5.raw_digest( value.high(), value.low( ));
     return value;

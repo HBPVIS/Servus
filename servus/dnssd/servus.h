@@ -16,17 +16,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifdef _MSC_VER
-#  include "../os.h"
-#else
-#  include <arpa/inet.h>
-#  include <sys/time.h>
-#  include <unistd.h>
-#endif
+#include <arpa/inet.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include <dns_sd.h>
 
 #include <algorithm>
-
 
 #define WARN std::cerr << __FILE__ << ":" << __LINE__ << ": "
 
@@ -166,7 +161,7 @@ private:
             return;
 
         TXTRecordRef record;
-        createTXTRecord_( record );
+        _createTXTRecord( record );
 
         const DNSServiceErrorType error =
             DNSServiceUpdateRecord( _out, 0, 0,
@@ -177,7 +172,7 @@ private:
             WARN << "DNSServiceUpdateRecord error: " << error << std::endl;
     }
 
-    void createTXTRecord_( TXTRecordRef& record )
+    void _createTXTRecord( TXTRecordRef& record )
     {
         TXTRecordCreate( &record, 0, 0 );
         for( detail::ValueMapCIter i = _data.begin(); i != _data.end(); ++i )

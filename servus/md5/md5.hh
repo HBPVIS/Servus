@@ -49,7 +49,11 @@ documentation and/or software.
    typedef UINT64 uint64_t;
 #endif
 
-class MD5 {
+namespace md5
+{
+
+class MD5
+{
 
 public:
 // methods for controlled operation:
@@ -114,3 +118,5 @@ private:
 			    uint4 s, uint4 ac);
 
 };
+
+}

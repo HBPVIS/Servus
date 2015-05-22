@@ -26,7 +26,6 @@
 
 #include <map>
 #include <memory>
-#include <cassert>
 
 namespace servus
 {

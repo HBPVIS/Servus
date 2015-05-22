@@ -8,7 +8,7 @@ Servus API Documentation {#mainpage}
 Welcome to Servus, a small C++ network utility library that provides a zeroconf
 API, uri parsing and UUIDs.
 
-Servus 0.1 can be retrieved by cloning the [source
+Servus 1.0 can be retrieved by cloning the [source
 code](https://github.com/HBPVIS/servus). Please file a [Bug
 Report](https://github.com/HBPVis/servus/issues) if you find any issues with
 this release.
@@ -26,7 +26,7 @@ Servus provides classes for:
 
 ## Changes {#Changes}
 
-### Version 0.1
+### Version 1.0
 
 * Initial version.
 

@@ -2,7 +2,7 @@ Servus - A small set of network oriented utilities in C++ including a zeroconf i
 
 Servus is licensed under the LGPL version 3, unless noted otherwise, e.g., for external dependencies. See file COPYING.txt for the full license. External dependencies are either LGPL or BSD-licensed. See file ACKNOWLEDGEMENTS.txt and AUTHORS.txt for further details.
 
-Copyright (C) 2014, Human Brain Project and AUTHORS.txt
+Copyright (C) 2014-2015, Human Brain Project and AUTHORS.txt
 
 This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License version 3 as published by the Free Software Foundation.
 

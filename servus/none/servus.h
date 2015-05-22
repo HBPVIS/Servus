@@ -58,7 +58,7 @@ public:
         return getInstances();
     }
 
-    void _updateRecord() final {};
+    void _updateRecord() final {}
 };
 }
 }
