@@ -84,7 +84,9 @@ enum URIPart { SCHEME = 0, AUTHORITY, PATH, QUERY, FRAGMENT, HIERARCHY };
 bool _parseURIPart( std::string& input, const URIPart& part,
                     std::string& output )
 {
+#ifndef NDEBUG
     const char requireFirst[] = { 0, 0, 0, '?', '#' };
+#endif
     const char* const separators[] = { ":", "/?#", "?#", "#", "" };
     const char* const disallowed[] = { "/?#", 0, 0, 0, 0 };
     const bool needsSeparator[] = { true, false, false, false, false };
