@@ -235,7 +235,8 @@ private:
             {
                 std::string authority;
                 _parseURIPart( input, part, authority );
-                _parseAuthority( _uriData, authority );
+                if( !authority.empty( ))
+                    _parseAuthority( _uriData, authority );
                 part = PATH;
                 break;
             }
