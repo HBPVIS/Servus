@@ -26,6 +26,10 @@ Servus provides classes for:
 
 ## Changes {#Changes}
 
+### Version 1.0.1
+
+* Fixed URI parsing for URI without authority.
+
 ### Version 1.0
 
 * Initial version.

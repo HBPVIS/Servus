@@ -45,6 +45,13 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
 
     const servus::URI uppercaseURI( "FOO:" );
     BOOST_CHECK_EQUAL( uppercaseURI.getScheme(), "foo" );
+
+    servus::URI noauthority( "scheme:///path" );
+    BOOST_CHECK_EQUAL( noauthority.getPath(), "/path" );
+    BOOST_CHECK( noauthority.getHost().empty( ));
+    BOOST_CHECK_EQUAL( noauthority.getScheme(), "scheme" );
+    BOOST_CHECK( noauthority.getQuery().empty( ));
+    BOOST_CHECK( noauthority.getFragment().empty( ));
 }
 
 BOOST_AUTO_TEST_CASE(test_setters)
@@ -93,6 +100,7 @@ BOOST_AUTO_TEST_CASE(test_file_uris)
     BOOST_CHECK( file3.getQuery().empty( ));
     BOOST_CHECK( file3.getFragment().empty( ));
 
+    // This is an exception to the generic syntax
     servus::URI file4( "file://bla.txt" );
     BOOST_CHECK_EQUAL( file4.getPath(), "bla.txt" );
     BOOST_CHECK( file4.getHost().empty( ));
