@@ -16,12 +16,15 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <arpa/inet.h>
-#include <sys/time.h>
-#include <unistd.h>
+#ifndef _MSC_VER
+#  include <arpa/inet.h>
+#  include <sys/time.h>
+#  include <unistd.h>
+#endif
 #include <dns_sd.h>
 
 #include <algorithm>
+#include <cassert>
 
 #define WARN std::cerr << __FILE__ << ":" << __LINE__ << ": "
 
@@ -54,7 +57,7 @@ public:
             return servus::Servus::Result( servus::Servus::Result::PENDING);
 
         TXTRecordRef record;
-        createTXTRecord_( record );
+        _createTXTRecord( record );
 
         const servus::Servus::Result result(
             DNSServiceRegister( &_out, 0 /* flags */,

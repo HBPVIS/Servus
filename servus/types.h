@@ -21,9 +21,6 @@
 #ifndef SERVUS_TYPES_H
 #define SERVUS_TYPES_H
 
-#include "uint128_t.h"
-#include "uri.h"
-
 #include <sys/types.h>
 #ifndef _MSC_VER
 #  include <stdint.h>
@@ -51,6 +48,11 @@ typedef SSIZE_T ssize_t;
 
 namespace servus
 {
+
+class Servus;
+class URI;
+class uint128_t;
+
 typedef std::vector< std::string > Strings;
 }
 

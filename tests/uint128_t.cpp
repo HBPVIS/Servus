@@ -20,15 +20,16 @@
 
 // Tests the functionality of universally unique identifiers and 128 bit ints
 
-#include <servus/uint128_t.h>
-
-#define BOOST_TEST_MODULE
+#define BOOST_TEST_MODULE servus_uint128_t
 #include <boost/test/unit_test.hpp>
 
-#include <thread>
-#include <mutex>
-#include <unordered_map>
+#include <servus/uint128_t.h>
+
 #include <iostream>
+#include <mutex>
+#include <random>
+#include <thread>
+#include <unordered_map>
 
 const size_t N_UUIDS = 10000;
 const size_t N_THREADS = 10;

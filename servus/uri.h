@@ -24,6 +24,7 @@
 #include <servus/types.h>
 
 #include <map>
+#include <sstream>
 
 namespace servus
 {

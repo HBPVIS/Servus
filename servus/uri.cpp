@@ -164,7 +164,7 @@ void _parseQueryMap( URIData& data )
     }
 }
 
-void _tolower( std::string& str )
+void _toLower( std::string& str )
 {
     std::transform( str.begin(), str.end(), str.begin(), ::tolower );
 }
@@ -203,7 +203,7 @@ private:
             {
             case SCHEME:
                 _parseURIPart( input, part, _uriData.scheme );
-                _tolower( _uriData.scheme );
+                _toLower( _uriData.scheme );
                 if( !_uriData.scheme.empty( ) &&
                     ( !isalpha( _uriData.scheme[0] ) ||
                       _uriData.scheme.find_first_not_of(
