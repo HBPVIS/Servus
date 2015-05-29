@@ -261,7 +261,8 @@ private:
         servus->registerCB_( name, type, domain, error );
     }
 
-    void registerCB_( const char* name, const char* type, const char* domain,
+    void registerCB_( const char* /*name*/, const char* /*type*/,
+                      const char* /*domain*/,
                       DNSServiceErrorType error )
     {
         //if( error == kDNSServiceErr_NoError)

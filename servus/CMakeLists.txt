@@ -16,7 +16,28 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-include(files.cmake)
+set(SERVUS_PUBLIC_HEADERS
+  ${COMMON_INCLUDES}
+  result.h
+  servus.h
+  types.h
+  uint128_t.h
+  uri.h
+  )
+
+set(SERVUS_HEADERS
+  avahi/servus.h
+  dnssd/servus.h
+  none/servus.h
+  )
+
+set(SERVUS_SOURCES
+  ${COMMON_SOURCES}
+  md5/md5.cc
+  servus.cpp
+  uint128_t.cpp
+  uri.cpp
+  )
 
 if(MSVC)
   list(APPEND SERVUS_LINK_LIBRARIES ws2_32)
@@ -28,10 +49,8 @@ if(AVAHI-CLIENT_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES ${avahi-client_LIBRARIES})
 endif()
 
-set(SERVUS_OMIT_PROJECT_HEADER 1)
+set(SERVUS_OMIT_PROJECT_HEADER ON)
 common_library(Servus)
 source_group(\\ FILES CMakeLists.txt)
 source_group(servus FILES ${SERVUS_PUBLIC_HEADERS} ${SERVUS_HEADERS}
   ${SERVUS_SOURCES})
-
-
