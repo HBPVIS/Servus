@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#define BOOST_TEST_MODULE
+#define BOOST_TEST_MODULE servus_uri
 #include <boost/test/unit_test.hpp>
 
 #include <servus/uri.h>
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     BOOST_CHECK_EQUAL( hostPortURI.getPort(), 12345 );
 
     const servus::URI uppercaseURI( "FOO:" );
-    BOOST_CHECK_EQUAL( hostPortURI.getScheme(), "foo" );
+    BOOST_CHECK_EQUAL( uppercaseURI.getScheme(), "foo" );
 }
 
 BOOST_AUTO_TEST_CASE(test_setters)

@@ -16,10 +16,10 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "servus/servus.h"
-
-#define BOOST_TEST_MODULE
+#define BOOST_TEST_MODULE servus_servus
 #include <boost/test/unit_test.hpp>
+
+#include <servus/servus.h>
 
 #include <random>
 #include <thread>
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
     }
 
 #ifdef SERVUS_USE_DNSSD
-    BOOST_CHECK_EQUAL( servus::Result::SUCCESS == kDNSServiceErr_NoError );
+    BOOST_CHECK( servus::Result::SUCCESS == kDNSServiceErr_NoError );
 #endif
     if( result != servus::Result::SUCCESS ) // happens on CI VMs
     {

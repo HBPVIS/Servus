@@ -18,6 +18,9 @@
 
 include(files.cmake)
 
+if(MSVC)
+  list(APPEND SERVUS_LINK_LIBRARIES ws2_32)
+endif()
 if(DNSSD_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES ${DNSSD_LIBRARIES})
 endif()
