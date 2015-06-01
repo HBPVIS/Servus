@@ -20,6 +20,10 @@
 
 // Tests the functionality of universally unique identifiers and 128 bit ints
 
+#if __cplusplus > 199711L
+#  define CPLUSPLUS11
+#endif
+
 #define BOOST_TEST_MODULE servus_uint128_t
 #include <boost/test/unit_test.hpp>
 
@@ -29,12 +33,20 @@
 #include <mutex>
 #include <random>
 #include <thread>
-#include <unordered_map>
+#ifdef CPLUSPLUS11
+#  include <unordered_map>
+#else
+#  include <map>
+#endif
 
 const size_t N_UUIDS = 10000;
 const size_t N_THREADS = 10;
 
-typedef std::unordered_map< servus::uint128_t, bool > TestHash;
+#ifdef CPLUSPLUS11
+typedef std::unordered_map< servus::uint128_t, bool > TestMap;
+#else
+typedef std::map< servus::uint128_t, bool > TestMap;
+#endif
 
 void testConvertUint128ToUUID();
 void testIncrement();
@@ -53,13 +65,13 @@ public:
                 // Boost.Test is not thread safe
                 std::unique_lock< std::mutex > lock( _mutex );
                 BOOST_CHECK( uuid.isUUID( ));
-                BOOST_CHECK( hash.find( uuid ) == hash.end( ));
+                BOOST_CHECK( map.find( uuid ) == map.end( ));
             }
-            hash[ uuid ] = true;
+            map[ uuid ] = true;
         }
     }
 
-    TestHash hash;
+    TestMap map;
 
 private:
     static std::mutex _mutex;
@@ -153,14 +165,14 @@ BOOST_AUTO_TEST_CASE(test_perf_test)
         std::chrono::system_clock::now() - startTime;
 
     std::cerr << N_UUIDS * N_THREADS / elapsed.count()
-              << " UUID generations and hash ops / ms" << std::endl;
+              << " UUID generations and map ops / ms" << std::endl;
 
-    TestHash& first = maps[0].hash;
+    TestMap& first = maps[0].map;
     for( size_t i = 1; i < N_THREADS; ++i )
     {
-        TestHash& current = maps[i].hash;
+        TestMap& current = maps[i].map;
 
-        for( TestHash::const_iterator j = current.begin();
+        for( TestMap::const_iterator j = current.begin();
              j != current.end(); ++j )
         {
             servus::uint128_t uuid( j->first );
