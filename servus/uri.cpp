@@ -340,6 +340,11 @@ void URI::setScheme( const std::string& scheme )
     _impl->getData().scheme = scheme;
 }
 
+void URI::setUserInfo( const std::string& userinfo )
+{
+    _impl->getData().userinfo = userinfo;
+}
+
 void URI::setHost( const std::string& host )
 {
     _impl->getData().host = host;
@@ -348,6 +353,16 @@ void URI::setHost( const std::string& host )
 void URI::setPort( const uint16_t port )
 {
     _impl->getData().port = port;
+}
+
+void URI::setPath( const std::string& path )
+{
+    _impl->getData().path = path;
+}
+
+void URI::setFragment( const std::string& fragment )
+{
+    _impl->getData().fragment = fragment;
 }
 
 URI::ConstKVIter URI::queryBegin() const
