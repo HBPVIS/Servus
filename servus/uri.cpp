@@ -102,13 +102,13 @@ bool _parseURIPart( std::string& input, const URIPart& part,
             return true;
         }
     }
-    else if ( disallowed[part] &&
-              input.find_first_of( disallowed[part] ) < pos )
+    else if ( pos == 0 ||
+              ( disallowed[part] &&
+                input.find_first_of( disallowed[part] ) < pos ))
     {
         output = "";
         return true;
     }
-
     // If the separator is not the first character, assert that parts requiring
     // an initial character find it.
     assert( !requireFirst[part] || pos == 0 || input[0] == requireFirst[part] );

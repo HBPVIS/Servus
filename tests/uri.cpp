@@ -47,11 +47,25 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     BOOST_CHECK_EQUAL( uppercaseURI.getScheme(), "foo" );
 
     servus::URI noauthority( "scheme:///path" );
-    BOOST_CHECK_EQUAL( noauthority.getPath(), "/path" );
-    BOOST_CHECK( noauthority.getHost().empty( ));
     BOOST_CHECK_EQUAL( noauthority.getScheme(), "scheme" );
+    BOOST_CHECK( noauthority.getHost().empty( ));
+    BOOST_CHECK_EQUAL( noauthority.getPath(), "/path" );
     BOOST_CHECK( noauthority.getQuery().empty( ));
     BOOST_CHECK( noauthority.getFragment().empty( ));
+
+    servus::URI query( "scheme:///?query=no_fragment" );
+    BOOST_CHECK_EQUAL( query.getScheme(), "scheme" );
+    BOOST_CHECK_EQUAL( query.getPath(), "/" );
+    BOOST_CHECK( query.getHost().empty( ));
+    BOOST_CHECK_EQUAL( query.getQuery(), "query=no_fragment" );
+    BOOST_CHECK( query.getFragment().empty( ));
+
+    servus::URI fragment( "scheme:///#fragment,no,query" );
+    BOOST_CHECK_EQUAL( fragment.getScheme(), "scheme" );
+    BOOST_CHECK_EQUAL( fragment.getPath(), "/" );
+    BOOST_CHECK( fragment.getHost().empty( ));
+    BOOST_CHECK( fragment.getQuery().empty( ));
+    BOOST_CHECK_EQUAL( fragment.getFragment(), "fragment,no,query" );
 }
 
 BOOST_AUTO_TEST_CASE(test_setters)
