@@ -310,6 +310,18 @@ const std::string &URI::getHost() const
     return _impl->getData().host;
 }
 
+std::string URI::getAuthority() const
+{
+    std::stringstream authority;
+    if( !_impl->getData().userinfo.empty())
+        authority << _impl->getData().userinfo << "@";
+    // IPv6 IPs are not considered.
+    authority << _impl->getData().host;
+    if( _impl->getData().port )
+        authority << ":" << _impl->getData().port;
+    return authority.str();
+}
+
 uint16_t URI::getPort() const
 {
     return _impl->getData().port;

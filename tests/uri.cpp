@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     BOOST_CHECK_EQUAL( uri.getHost(), "www.example.com" );
     BOOST_CHECK_EQUAL( uri.getUserinfo(), "bob" );
     BOOST_CHECK_EQUAL( uri.getPort(), 8080 );
+    BOOST_CHECK_EQUAL( uri.getAuthority(), "bob@www.example.com:8080" );
     BOOST_CHECK_EQUAL( uri.getPath(), "/path/" );
     BOOST_CHECK_EQUAL( uri.getQuery(), "key=value,foo=bar" );
     BOOST_CHECK_EQUAL( uri.getFragment(), "fragment" );
@@ -41,7 +42,16 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     const servus::URI hostPortURI( "foo://hostname:12345" );
     BOOST_CHECK_EQUAL( hostPortURI.getScheme() ,  "foo" );
     BOOST_CHECK_EQUAL( hostPortURI.getHost() , "hostname" );
+    BOOST_CHECK( hostPortURI.getUserinfo().empty() );
     BOOST_CHECK_EQUAL( hostPortURI.getPort(), 12345 );
+    BOOST_CHECK_EQUAL( hostPortURI.getAuthority(), "hostname:12345" );
+
+    const servus::URI userHostURI( "foo://alice@hostname" );
+    BOOST_CHECK_EQUAL( userHostURI.getScheme() ,  "foo" );
+    BOOST_CHECK_EQUAL( userHostURI.getHost() , "hostname" );
+    BOOST_CHECK_EQUAL( userHostURI.getUserinfo(), "alice" );
+    BOOST_CHECK_EQUAL( userHostURI.getPort(), 0 );
+    BOOST_CHECK_EQUAL( userHostURI.getAuthority(), "alice@hostname" );
 
     const servus::URI uppercaseURI( "FOO:" );
     BOOST_CHECK_EQUAL( uppercaseURI.getScheme(), "foo" );
@@ -49,6 +59,7 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     servus::URI noauthority( "scheme:///path" );
     BOOST_CHECK_EQUAL( noauthority.getScheme(), "scheme" );
     BOOST_CHECK( noauthority.getHost().empty( ));
+    BOOST_CHECK( noauthority.getAuthority().empty( ));
     BOOST_CHECK_EQUAL( noauthority.getPath(), "/path" );
     BOOST_CHECK( noauthority.getQuery().empty( ));
     BOOST_CHECK( noauthority.getFragment().empty( ));

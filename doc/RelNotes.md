@@ -26,6 +26,10 @@ Servus provides classes for:
 
 ## Changes {#Changes}
 
+### Version 1.1
+
+* Added the function URI::getAuthority
+
 ### Version 1.0.1
 
 * Fixed URI parsing for URI without authority.
