@@ -91,6 +91,11 @@ public:
     SERVUS_API const std::string& getUserinfo() const;
     SERVUS_API uint16_t getPort() const;
     SERVUS_API const std::string& getHost() const;
+    /** Return the compound authority part of the URI.
+
+        User info added only if not empty, port number added only if it's
+        different from 0. */
+    SERVUS_API std::string getAuthority() const;
     SERVUS_API const std::string& getPath() const;
     SERVUS_API const std::string& getQuery() const;
     SERVUS_API const std::string& getFragment() const;
