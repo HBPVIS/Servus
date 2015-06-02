@@ -1,6 +1,6 @@
-/* Copyright (c) 2010, Cedric Stalder <cedric.stalder@gmail.com>
- *               2010-2014, Stefan Eilemann <eile@eyescale.ch>
- *               2010-2012, Daniel Nachbaur <danielnachbaur@gmail.com>
+/* Copyright (c) 2010-2015, Cedric Stalder <cedric.stalder@gmail.com>
+ *                          Stefan Eilemann <eile@eyescale.ch>
+ *                          Daniel Nachbaur <danielnachbaur@gmail.com>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -342,80 +342,66 @@ SERVUS_API uint128_t make_UUID();
 
 }
 
-#if __cplusplus > 199711L
+#if __cplusplus >= 201103L
 // C++11
-#  define HASH_NAMESPACE_OPEN namespace std {
-#  define HASH_NAMESPACE_CLOSE }
-#  define HASH_USE_STRUCT
+#  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
+#  define SERVUS_HASH_NAMESPACE_CLOSE }
+#  define SERVUS_HASH_USE_STRUCT
 #  include <functional>
 #elif defined __clang__ || defined __xlC__
 // C++03 with clang and xlC
-#  define HASH_NAMESPACE_OPEN namespace std { namespace tr1 {
-#  define HASH_NAMESPACE_CLOSE }}
-#  define HASH_USE_STRUCT
+#  define SERVUS_HASH_NAMESPACE_OPEN namespace std { namespace tr1 {
+#  define SERVUS_HASH_NAMESPACE_CLOSE }}
+#  define SERVUS_HASH_USE_STRUCT
 #  include <tr1/unordered_set>
 #elif __GNUC__
 // C++03 with gcc and icc
-#  define HASH_NAMESPACE_OPEN namespace __gnu_cxx {
-#  define HASH_NAMESPACE_CLOSE }
-#  define HASH_USE_STRUCT
+#  define SERVUS_HASH_NAMESPACE_OPEN namespace __gnu_cxx {
+#  define SERVUS_HASH_NAMESPACE_CLOSE }
+#  define SERVUS_HASH_USE_STRUCT
 // I didn't found a better way to get rid of the unwanted warning
 #  define _GLIBCXX_PERMIT_BACKWARD_HASH
 #  include <ext/hash_set> // Needed for hash< uint64_t >
 #  undef _GLIBCXX_PERMIT_BACKWARD_HASHH
 #elif MSCV
 // C++03 with MSVC
-#  define HASH_NAMESPACE_OPEN namespace std {
-#  define HASH_NAMESPACE_CLOSE }
-#  define HASH_USE_FUNCTORS
+#  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
+#  define SERVUS_HASH_NAMESPACE_CLOSE }
+#  define SERVUS_HASH_USE_FUNCTORS
 #  include <ext/hash_set>
 #else
-// Unknown compiler, has support is disabled.
-#  define NO_HASH
+// Unknown compiler, hash support is disabled.
+#  define SERVUS_HASH_NONE
 #endif
 
+#ifndef SERVUS_HASH_NONE
+SERVUS_HASH_NAMESPACE_OPEN
+#  ifdef SERVUS_HASH_USE_STRUCT
 
-#ifndef NO_HASH
-
-HASH_NAMESPACE_OPEN
-
-#  ifdef HASH_USE_STRUCT
-
-template<>
-struct hash< servus::uint128_t >
+template<> struct hash< servus::uint128_t >
 {
     typedef size_t result_type;
 
     result_type operator()( const servus::uint128_t& in ) const
     {
         hash< uint64_t > forward;
-        return forward( in.high( )) ^ forward( in.low( ));
-    }
-    result_type operator()( const servus::uint128_t& in )
-    {
-        hash< uint64_t > forward;
-        return forward( in.high( )) ^ forward( in.low( ));
+        return forward( in.high() ^ in.low( ));
     }
 };
-#    undef HASH_USE_STRUCT
 
-#  else // HASH_USE_FUNCTORS
-template<> inline size_t hash_compare< lunchbox::uint128_t >::operator()
-    ( const lunchbox::uint128_t& key ) const
+#  else // SERVUS_HASH_USE_FUNCTORS
+
+template<> inline size_t hash_compare< servus::uint128_t >::operator()
+    ( const servus::uint128_t& key ) const
 {
     return static_cast< size_t >( key.high() ^ key.low() );
 }
 
-template<> inline size_t hash_value( const lunchbox::uint128_t& key )
+template<> inline size_t hash_value( const servus::uint128_t& key )
     { return static_cast< size_t >( key.high() ^ key.low() ); }
-#    undef HASH_USE_FUNCTORS
 #  endif
 
-HASH_NAMESPACE_CLOSE
+SERVUS_HASH_NAMESPACE_CLOSE
 
-#undef HASH_NAMESPACE_OPEN
-#undef HASH_NAMESPACE_CLOSE
-
-#endif // NO_HASH
-
+#endif // SERVUS_HASH
 #endif // SERVUS_UINT128_H

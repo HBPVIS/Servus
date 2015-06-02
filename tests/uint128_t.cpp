@@ -1,6 +1,6 @@
 
-/* Copyright (c) 2010-2014, Stefan Eilemann <eile@equalizergraphics.com>
- *                    2015, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2010-2015, Stefan Eilemann <eile@equalizergraphics.com>
+ *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -20,33 +20,32 @@
 
 // Tests the functionality of universally unique identifiers and 128 bit ints
 
-#if __cplusplus > 199711L
-#  define CPLUSPLUS11
-#endif
-
 #define BOOST_TEST_MODULE servus_uint128_t
 #include <boost/test/unit_test.hpp>
 
 #include <servus/uint128_t.h>
-
+#include <boost/unordered_map.hpp>
+#include <boost/functional/hash.hpp>
 #include <iostream>
 #include <mutex>
 #include <random>
 #include <thread>
-#ifdef CPLUSPLUS11
-#  include <unordered_map>
-#else
-#  include <map>
-#endif
 
 const size_t N_UUIDS = 10000;
 const size_t N_THREADS = 10;
 
-#ifdef CPLUSPLUS11
-typedef std::unordered_map< servus::uint128_t, bool > TestMap;
-#else
-typedef std::map< servus::uint128_t, bool > TestMap;
-#endif
+typedef boost::unordered_map< servus::uint128_t, bool > TestHash;
+namespace boost
+{
+template<> struct hash< servus::uint128_t >
+{
+    std::size_t operator()( const servus::uint128_t& in ) const
+    {
+        hash< uint64_t > forward;
+        return forward( in.high() ^ in.low( ));
+    }
+};
+}
 
 void testConvertUint128ToUUID();
 void testIncrement();
@@ -65,13 +64,13 @@ public:
                 // Boost.Test is not thread safe
                 std::unique_lock< std::mutex > lock( _mutex );
                 BOOST_CHECK( uuid.isUUID( ));
-                BOOST_CHECK( map.find( uuid ) == map.end( ));
+                BOOST_CHECK( hash.find( uuid ) == hash.end( ));
             }
-            map[ uuid ] = true;
+            hash[ uuid ] = true;
         }
     }
 
-    TestMap map;
+    TestHash hash;
 
 private:
     static std::mutex _mutex;
@@ -165,14 +164,14 @@ BOOST_AUTO_TEST_CASE(test_perf_test)
         std::chrono::system_clock::now() - startTime;
 
     std::cerr << N_UUIDS * N_THREADS / elapsed.count()
-              << " UUID generations and map ops / ms" << std::endl;
+              << " UUID generations and hash ops / ms" << std::endl;
 
-    TestMap& first = maps[0].map;
+    TestHash& first = maps[0].hash;
     for( size_t i = 1; i < N_THREADS; ++i )
     {
-        TestMap& current = maps[i].map;
+        TestHash& current = maps[i].hash;
 
-        for( TestMap::const_iterator j = current.begin();
+        for( TestHash::const_iterator j = current.begin();
              j != current.end(); ++j )
         {
             servus::uint128_t uuid( j->first );
