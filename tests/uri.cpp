@@ -88,6 +88,12 @@ BOOST_AUTO_TEST_CASE(test_setters)
     BOOST_CHECK_EQUAL( uri.getHost(), "host" );
     uri.setPort( 12345 );
     BOOST_CHECK_EQUAL( uri.getPort(), 12345 );
+    uri.setPath( "path" );
+    BOOST_CHECK_EQUAL( uri.getPath(), "path" );
+    uri.setFragment( "fragment" );
+    BOOST_CHECK_EQUAL( uri.getFragment(), "fragment" );
+
+    // The query setter is tested independently.
 }
 
 BOOST_AUTO_TEST_CASE(test_empty_uri)
@@ -232,4 +238,46 @@ BOOST_AUTO_TEST_CASE(test_corner_cases)
     servus::URI uri6( "foo://*:0" );
     BOOST_CHECK_EQUAL( uri6.getScheme(), "foo" );
     BOOST_CHECK_EQUAL( uri6.getHost(), "*" );
+}
+
+BOOST_AUTO_TEST_CASE(test_print)
+{
+    servus::URI uri;
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "" );
+
+    uri.setPath( "/path" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "/path" );
+
+    uri.setUserInfo( "user" );
+    // No hostname yet, user info ignored.
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "/path" );
+
+    uri.setPort( 1024 );
+    // No hostname yet, port ignored.
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "/path" );
+
+    uri.setHost( "localhost" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "user@localhost:1024/path" );
+
+    uri.setScheme( "foo" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ),
+                       "foo://user@localhost:1024/path" );
+
+    uri.setHost( "" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ), "foo:///path" );
+
+    uri.setHost( "localhost" );
+    uri.setFragment( "fragment" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ),
+                       "foo://user@localhost:1024/path#fragment" );
+
+    uri.setFragment( "" );
+    uri.addQuery( "key", "value");
+    BOOST_CHECK_EQUAL( std::to_string( uri ),
+                       "foo://user@localhost:1024/path?key=value" );
+
+    uri.setFragment( "fragment" );
+    BOOST_CHECK_EQUAL( std::to_string( uri ),
+                       "foo://user@localhost:1024/path?key=value#fragment" );
+
 }

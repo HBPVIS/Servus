@@ -104,8 +104,11 @@ public:
     /** @name Setters for uri data. */
     //@{
     SERVUS_API void setScheme( const std::string& scheme );
+    SERVUS_API void setUserInfo( const std::string& userinfo );
     SERVUS_API void setHost( const std::string& host );
     SERVUS_API void setPort( uint16_t port );
+    SERVUS_API void setPath( const std::string& path );
+    SERVUS_API void setFragment( const std::string& fragment );
     //@}
 
     /** @name Access to key-value data in query. */
@@ -127,7 +130,7 @@ public:
 
     /** Add a key-value pair to the query. */
     SERVUS_API void addQuery( const std::string& key,
-                                const std::string& value );
+                              const std::string& value );
     //@}
 
 private:
@@ -138,11 +141,16 @@ inline std::ostream& operator << ( std::ostream& os, const URI& uri )
 {
     if( !uri.getScheme().empty( ))
         os << uri.getScheme() << "://";
-    if( !uri.getUserinfo().empty( ))
-        os << uri.getUserinfo() << "@";
-    os << uri.getHost();
-    if( uri.getPort( ))
-        os << ':' << uri.getPort();
+    // A valid URI can't contain the user info or port number alone, so if
+    // the host name is empty the other two field are simply ignored.
+    if( !uri.getHost().empty( ))
+    {
+        if( !uri.getUserinfo().empty( ))
+            os << uri.getUserinfo() << "@";
+        os << uri.getHost();
+        if( uri.getPort( ))
+            os << ':' << uri.getPort();
+    }
     os << uri.getPath();
     if( !uri.getQuery().empty( ))
         os << '?' << uri.getQuery();
