@@ -25,7 +25,6 @@
 #include <servus/types.h>
 
 #include <map>
-#include <memory>
 
 namespace servus
 {
@@ -82,18 +81,8 @@ public:
      */
     SERVUS_API explicit Servus( const std::string& name );
 
-    /**
-     * Copy-construct a ZeroConf service.
-     *
-     * Both objects will share the same underlying ZeroConf implementation.
-     */
-    SERVUS_API Servus( const Servus& from );
-
     /** Destruct this service. */
     SERVUS_API virtual ~Servus();
-
-    /** Share the ZeroConf service with the rhs argument */
-    SERVUS_API Servus& operator = ( const Servus& rhs );
 
     /** @return the service name. */
     SERVUS_API const std::string& getName() const;
@@ -187,7 +176,9 @@ public:
     SERVUS_API void getData( Data& data );
 
 private:
-    std::shared_ptr< detail::Servus > _impl;
+    Servus( const Servus& );
+    Servus& operator=( const Servus& );
+    detail::Servus* const _impl;
     friend SERVUS_API std::ostream& operator << ( std::ostream&,
                                                     const Servus& );
 };
