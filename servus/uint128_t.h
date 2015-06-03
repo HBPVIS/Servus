@@ -385,7 +385,7 @@ template<> struct hash< servus::uint128_t >
     result_type operator()( const servus::uint128_t& in ) const
     {
         hash< uint64_t > forward;
-        return forward( in.high() ^ in.low( ));
+        return forward( in.high( )) ^ forward( in.low( ));
     }
 };
 
@@ -394,11 +394,11 @@ template<> struct hash< servus::uint128_t >
 template<> inline size_t hash_compare< servus::uint128_t >::operator()
     ( const servus::uint128_t& key ) const
 {
-    return static_cast< size_t >( key.high() ^ key.low() );
+    return static_cast< size_t >( key.high() ^ key.low( ));
 }
 
 template<> inline size_t hash_value( const servus::uint128_t& key )
-    { return static_cast< size_t >( key.high() ^ key.low() ); }
+    { return static_cast< size_t >( key.high() ^ key.low( )); }
 #  endif
 
 SERVUS_HASH_NAMESPACE_CLOSE
