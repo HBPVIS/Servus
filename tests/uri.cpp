@@ -219,6 +219,8 @@ BOOST_AUTO_TEST_CASE(test_invalid_uri)
                        std::exception );
     BOOST_CHECK_THROW( servus::URI uri( "http://host:" ),
                        std::exception );
+    BOOST_CHECK_THROW( servus::URI skypeCrasher( "http://:" ),
+                       std::exception );
 }
 
 BOOST_AUTO_TEST_CASE(test_corner_cases)
