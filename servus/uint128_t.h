@@ -342,7 +342,7 @@ SERVUS_API uint128_t make_UUID();
 
 }
 
-#if __cplusplus >= 201103L
+#if __cplusplus >= 201103L || _MSC_VER > 1500
 // C++11
 #  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
 #  define SERVUS_HASH_NAMESPACE_CLOSE }
@@ -363,12 +363,11 @@ SERVUS_API uint128_t make_UUID();
 #  define _GLIBCXX_PERMIT_BACKWARD_HASH
 #  include <ext/hash_set> // Needed for hash< uint64_t >
 #  undef _GLIBCXX_PERMIT_BACKWARD_HASHH
-#elif MSCV
+#elif _MSC_VER < 1600
 // C++03 with MSVC
 #  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
 #  define SERVUS_HASH_NAMESPACE_CLOSE }
 #  define SERVUS_HASH_USE_FUNCTORS
-#  include <ext/hash_set>
 #else
 // Unknown compiler, hash support is disabled.
 #  define SERVUS_HASH_NONE
