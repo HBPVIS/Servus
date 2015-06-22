@@ -61,7 +61,7 @@ namespace detail
 class uri_parse : public std::exception
 {
 public:
-    uri_parse( const std::string& uri )
+    explicit uri_parse( const std::string& uri )
     {
         _error << "Error parsing URI string: " << uri << std::endl;
     }
