@@ -33,7 +33,14 @@ set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
 
 include(Common)
 
-include(FindPackages)
+if(LINUX)
+  common_package(avahi-client)
+else()
+  common_package(DNSSD)
+endif()
+common_package(Boost COMPONENTS unit_test_framework)
+common_package(Threads REQUIRED)
+common_package_post()
 
 add_subdirectory(servus)
 add_subdirectory(tests)
