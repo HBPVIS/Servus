@@ -25,8 +25,8 @@ include(GitExternal)
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "1")
-set(VERSION_PATCH "1")
-set(VERSION_ABI 1)
+set(VERSION_PATCH "0")
+set(VERSION_ABI 2)
 
 set(SERVUS_DESCRIPTION "A small set of network oriented utilities in C++ including a zeroconf implementation.")
 set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
@@ -39,5 +39,7 @@ add_subdirectory(servus)
 add_subdirectory(tests)
 
 include(CPackConfig)
+set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
+set(DOXYGEN_MAINPAGE_MD README.md)
 include(DoxygenRule) # must be after all targets
 
