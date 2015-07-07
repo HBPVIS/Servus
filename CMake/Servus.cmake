@@ -1,5 +1,5 @@
 
-set(SERVUS_PACKAGE_VERSION 1.0)
+set(SERVUS_PACKAGE_VERSION 1.1)
 set(SERVUS_REPO_URL https://github.com/HBPVis/Servus.git)
 set(SERVUS_DEPENDS hbpvis REQUIRED Threads OPTIONAL Boost DNSSD avahi-client)
 set(SERVUS_OPTIONAL ON)
