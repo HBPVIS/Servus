@@ -17,7 +17,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 set(SERVUS_PUBLIC_HEADERS
-  ${COMMON_INCLUDES}
   result.h
   servus.h
   types.h
@@ -32,7 +31,6 @@ set(SERVUS_HEADERS
   )
 
 set(SERVUS_SOURCES
-  ${COMMON_SOURCES}
   md5/md5.cc
   servus.cpp
   uint128_t.cpp
@@ -51,7 +49,7 @@ if(AVAHI-CLIENT_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES ${avahi-client_LIBRARIES})
 endif()
 
-set(SERVUS_OMIT_PROJECT_HEADER ON)
+set(SERVUS_OMIT_LIBRARY_HEADER ON)
 common_library(Servus)
 source_group(\\ FILES CMakeLists.txt)
 source_group(servus FILES ${SERVUS_PUBLIC_HEADERS} ${SERVUS_HEADERS}
