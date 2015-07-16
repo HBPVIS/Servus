@@ -51,6 +51,3 @@ endif()
 
 set(SERVUS_OMIT_LIBRARY_HEADER ON)
 common_library(Servus)
-source_group(\\ FILES CMakeLists.txt)
-source_group(servus FILES ${SERVUS_PUBLIC_HEADERS} ${SERVUS_HEADERS}
-  ${SERVUS_SOURCES})
