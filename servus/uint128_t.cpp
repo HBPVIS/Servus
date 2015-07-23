@@ -90,8 +90,11 @@ uint128_t make_UUID()
         // thread safe for robustness over performance.
         // Also, creating a new generator each call seems to increases the
         // chances of collissions up to a noticeable level.
+#ifndef _MSC_VER
+        // http://stackoverflow.com/questions/14711263/c11-stdmutex-in-visual-studio-2012-deadlock-when-locked-from-dllmain
         static std::mutex mutex;
         std::unique_lock< std::mutex > lock( mutex );
+#endif
         value.high() = generator( engine );
         value.low() = generator( engine );
     }
