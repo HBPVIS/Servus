@@ -93,8 +93,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
         return;
     }
 
-    BOOST_CHECK_EQUAL( hosts.size(), 1 );
-
+    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( hosts.front(), std::to_string( port ));
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     std::this_thread::sleep_for( std::chrono::milliseconds( 200 ));
@@ -103,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
     std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ));
 
     hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
-    BOOST_CHECK_EQUAL( hosts.size(), 1 );
+    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), "42" );
     BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
 
@@ -118,7 +117,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     BOOST_CHECK_EQUAL( service.browse( 200 ), service.browse( 0 ));
     hosts = service.getInstances();
-    BOOST_CHECK_EQUAL( hosts.size(), 1 );
+    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
 
@@ -140,7 +139,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_CHECK( !service.isBrowsing( ));
 
     hosts = service.getInstances();
-    BOOST_CHECK_EQUAL( hosts.size(), 1 );
+    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
 }
