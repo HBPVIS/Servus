@@ -45,7 +45,7 @@ typedef InstanceMap::const_iterator InstanceMapCIter;
 class Servus
 {
 public:
-    Servus( const std::string& name ) : _name( name ) {}
+    explicit Servus( const std::string& name ) : _name( name ) {}
     virtual ~Servus() {}
 
     virtual std::string getClassName() const = 0;

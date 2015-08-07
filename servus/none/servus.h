@@ -23,7 +23,7 @@ namespace none
 class Servus : public detail::Servus
 {
 public:
-    Servus( const std::string& name ) : detail::Servus( name ) {}
+    explicit Servus( const std::string& name ) : detail::Servus( name ) {}
     virtual ~Servus() {}
 
     std::string getClassName() const { return "none"; }
