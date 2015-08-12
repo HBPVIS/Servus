@@ -38,7 +38,7 @@ if(LINUX)
 else()
   common_package(DNSSD)
 endif()
-common_package(Boost COMPONENTS unit_test_framework)
+common_package(Boost 1.51 COMPONENTS unit_test_framework)
 common_package(Threads REQUIRED)
 common_package_post()
 
@@ -49,4 +49,3 @@ include(CPackConfig)
 set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
 set(DOXYGEN_MAINPAGE_MD README.md)
 include(DoxygenRule) # must be after all targets
-
