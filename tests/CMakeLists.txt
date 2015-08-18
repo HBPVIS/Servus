@@ -20,7 +20,7 @@ if(NOT BOOST_FOUND)
   return()
 endif()
 
-set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Servus)
+set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Servus ${CMAKE_THREAD_LIBS_INIT})
 
 include(CommonCTest)
 
