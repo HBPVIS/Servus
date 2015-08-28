@@ -63,7 +63,7 @@ public:
 
     /**
      * @param uri URI string to parse.
-     * @throw std::exception for incomplete URIs, and boost::bad_lexical_cast
+     * @throw std::exception for incomplete URIs, and std::invalid_argument
      *        if the port is not a number.
      */
     SERVUS_API explicit URI( const std::string& uri );
