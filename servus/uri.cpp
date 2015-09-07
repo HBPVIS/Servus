@@ -25,6 +25,7 @@
 #include <iostream>
 #include <cassert>
 #include <sstream>
+#include <stdexcept>
 
 namespace servus
 {
