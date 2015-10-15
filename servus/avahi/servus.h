@@ -149,7 +149,7 @@ public:
         const ::servus::Servus::Interface addr ) final
     {
         if( _browser )
-            return servus::Servus::Result( servus::Servus::Result::PENDING);
+            return servus::Servus::Result( servus::Servus::Result::PENDING );
 
         std::unique_lock< std::mutex > lock( _mutex );
         _scope = addr;
@@ -312,6 +312,8 @@ private:
 
         case AVAHI_BROWSER_REMOVE:
             _instanceMap.erase( name );
+            for( Listener* listener : _listeners )
+                listener->instanceRemoved( name );
             break;
 
         case AVAHI_BROWSER_ALL_FOR_NOW:
@@ -374,6 +376,8 @@ private:
                     const std::string value = entry.substr( pos + 1 );
                     values[ key ] = value;
                 }
+                for( Listener* listener : _listeners )
+                    listener->instanceAdded( name );
             } break;
         }
 

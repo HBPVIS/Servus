@@ -78,13 +78,14 @@ public:
      * Create a new service handle.
      *
      * @param name the service descriptor, e.g., "_hwsd._tcp"
+     * @version 1.1
      */
     SERVUS_API explicit Servus( const std::string& name );
 
-    /** Destruct this service. */
+    /** Destruct this service. @version 1.1 */
     SERVUS_API virtual ~Servus();
 
-    /** @return the service name. */
+    /** @return the service name. @version 1.1 */
     SERVUS_API const std::string& getName() const;
 
     /**
@@ -96,13 +97,15 @@ public:
      * which needs some time to propagate after this function returns, that is,
      * calling discover() immediately afterwards will very likely not contain
      * the new key/value pair.
+     *
+     * @version 1.1
      */
     SERVUS_API void set( const std::string& key, const std::string& value );
 
-    /** @return all (to be) announced keys. */
+    /** @return all (to be) announced keys. @version 1.1 */
     SERVUS_API Strings getKeys() const;
 
-    /** @return the value to the given (to be) announced key. */
+    /** @return the value to the given (to be) announced key. @version 1.1 */
     SERVUS_API const std::string& get( const std::string& key ) const;
 
     /**
@@ -111,14 +114,15 @@ public:
      * @param port the service IP port in host byte order.
      * @param instance a host-unique instance name, hostname is used if empty.
      * @return the success status of the operation.
+     * @version 1.1
      */
     SERVUS_API Result announce( const unsigned short port,
-                                  const std::string& instance );
+                                const std::string& instance );
 
-    /** Stop announcing the registered key/value pairs. */
+    /** Stop announcing the registered key/value pairs. @version 1.1 */
     SERVUS_API void withdraw();
 
-    /** @return true if the local data is announced. */
+    /** @return true if the local data is announced. @version 1.1 */
     SERVUS_API bool isAnnounced() const;
 
     /**
@@ -129,15 +133,17 @@ public:
      *                   records.
      * @return all instance names found during discovery.
      * @sa beginBrowsing(), browse(), endBrowsing()
+     * @version 1.1
      */
     SERVUS_API Strings discover( const Interface addr,
-                                   const unsigned browseTime );
+                                 const unsigned browseTime );
 
     /**
      * Begin the discovery of announced key/value pairs.
      *
      * @param addr the scope of the discovery
      * @return the success status of the operation.
+     * @version 1.1
      */
     SERVUS_API Result beginBrowsing( const servus::Servus::Interface addr );
 
@@ -146,28 +152,45 @@ public:
      *
      * @param timeout The time to spend browsing.
      * @return the success status of the operation.
+     * @version 1.1
      */
     SERVUS_API Result browse( int32_t timeout = -1 );
 
-    /** Stop a discovery process and return all results. */
+    /** Stop a discovery process and return all results. @version 1.1 */
     SERVUS_API void endBrowsing();
 
-    /** @return true if the local data is browsing. */
+    /** @return true if the local data is browsing. @version 1.1 */
     SERVUS_API bool isBrowsing() const;
 
-    /** @return all instances found during the last discovery. */
+    /** @return all instances found during the last discovery. @version 1.1 */
     SERVUS_API Strings getInstances() const;
 
-    /** @return all keys discovered on the given instance. */
+    /** @return all keys discovered on the given instance. @version 1.1 */
     SERVUS_API Strings getKeys( const std::string& instance ) const;
 
-    /** @return true if the given key was discovered. */
+    /** @return true if the given key was discovered. @version 1.1 */
     SERVUS_API bool containsKey( const std::string& instance,
-                                   const std::string& key ) const;
+                                 const std::string& key ) const;
 
-    /** @return the value of the given key and instance. */
+    /** @return the value of the given key and instance. @version 1.1 */
     SERVUS_API const std::string& get( const std::string& instance,
-                                         const std::string& key ) const;
+                                       const std::string& key ) const;
+
+    /**
+     * Add a listener which is invoked according to its supported callbacks.
+     *
+     * @param listener the listener to be added, must not be nullptr
+     * @version 1.2
+     */
+    SERVUS_API void addListener( Listener* listener );
+
+    /**
+     * Remove a listener to stop invokation on its supported callbacks.
+     *
+     * @param listener the listener to be removed, must not be nullptr
+     * @version 1.2
+     */
+    SERVUS_API void removeListener( Listener* listener );
 
     /** @internal */
     typedef std::map< std::string, std::map< std::string, std::string > > Data;
@@ -180,7 +203,7 @@ private:
     Servus& operator=( const Servus& );
     detail::Servus* const _impl;
     friend SERVUS_API std::ostream& operator << ( std::ostream&,
-                                                    const Servus& );
+                                                  const Servus& );
 };
 
 /** @return the local hostname. */
@@ -190,7 +213,7 @@ SERVUS_API std::string getHostname();
 SERVUS_API std::ostream& operator << ( std::ostream&, const Servus& );
 
 /** Output the servus interface in human-readable format. */
-SERVUS_API std::ostream& operator << (std::ostream&,const Servus::Interface&);
+SERVUS_API std::ostream& operator << ( std::ostream&,const Servus::Interface& );
 }
 
 #endif // SERVUS_SERVUS_H

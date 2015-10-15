@@ -5,10 +5,10 @@
 Servus is a small C++ network utility library that provides a zeroconf
 API, uri parsing and UUIDs.
 
-Servus 1.1 can be retrieved by cloning the [source
-code](https://github.com/HBPVIS/servus). Please file a [Bug
-Report](https://github.com/HBPVis/servus/issues) if you find any issues with
-this release.
+Servus 1.2 can be retrieved by cloning the
+[source code](https://github.com/HBPVIS/servus). Please file a
+[Bug Report](https://github.com/HBPVis/servus/issues) if you find any issues
+with this release.
 
 ## Features {#Features}
 
@@ -35,6 +35,8 @@ The following external, pre-installed optional dependencies are required:
 
 * Boost.Test to build unit tests.
 * Avahi (avahi-client) or DNSSD for zeroconf.
+* Qt5 Core for servus::qt::ItemModel.
+* Qt5 Widgets for servusBrowser tool.
 
 To download and compile Servus from source:
 

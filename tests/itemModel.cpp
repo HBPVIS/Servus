@@ -1,0 +1,199 @@
+/* Copyright (c) 2015, Human Brain Project
+ *                     Daniel.Nachbaur@epfl.ch
+ *
+ * This file is part of Servus <https://github.com/HBPVIS/Servus>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#define BOOST_TEST_MODULE servus_itemModel
+#include <boost/test/unit_test.hpp>
+
+#include <atomic>
+#include <chrono>
+#include <random>
+
+#include <QApplication>
+
+#include <servus/listener.h>
+#include <servus/servus.h>
+#include <servus/qt/itemModel.h>
+
+const std::string TEST_INSTANCE = "testInstance";
+const size_t DISCOVER_TIMEOUT = 5 /*seconds*/;
+
+uint16_t getRandomPort()
+{
+    static std::random_device device;
+    static std::minstd_rand engine( device( ));
+    std::uniform_int_distribution< uint16_t > generator( 1024, 65535u );
+    return generator( engine );
+}
+
+struct GlobalQtApp
+{
+    GlobalQtApp()
+        : app()
+    {
+        boost::unit_test::master_test_suite_t& testSuite =
+                boost::unit_test::framework::master_test_suite();
+        app.reset( new QCoreApplication( testSuite.argc, testSuite.argv ));
+    }
+
+    std::unique_ptr< QCoreApplication > app;
+};
+
+class Watchdog
+{
+public:
+    Watchdog()
+        : gotUpdate( false )
+    {}
+
+    void wait()
+    {
+        QCoreApplication* app = QCoreApplication::instance();
+        const auto startTime = std::chrono::high_resolution_clock::now();
+        while( !gotUpdate )
+        {
+            app->processEvents( QEventLoop::AllEvents, 100 /*ms*/ );
+            const auto duration =
+                    std::chrono::high_resolution_clock::now() - startTime;
+            const size_t elapsed =
+                    std::chrono::nanoseconds( duration ).count() / 1000000000;
+            if( elapsed > DISCOVER_TIMEOUT )
+                return;
+        }
+    }
+
+    std::atomic_bool gotUpdate;
+};
+
+class WatchAdd : public Watchdog, public servus::Listener
+{
+public:
+    WatchAdd()
+        : Watchdog()
+    {}
+
+    void instanceAdded( const std::string& instance ) final
+    {
+        BOOST_CHECK_EQUAL( instance, TEST_INSTANCE );
+        gotUpdate = true;
+    }
+
+    void instanceRemoved( const std::string& ) final {}
+};
+
+class WatchRemove : public Watchdog, public servus::Listener
+{
+public:
+    WatchRemove()
+        : Watchdog()
+    {}
+
+    void instanceAdded( const std::string& ) final {}
+
+    void instanceRemoved( const std::string& instance ) final
+    {
+        BOOST_CHECK_EQUAL( instance, TEST_INSTANCE );
+        gotUpdate = true;
+    }
+};
+
+BOOST_GLOBAL_FIXTURE( GlobalQtApp )
+
+BOOST_AUTO_TEST_CASE( invalidAccess )
+{
+    const uint32_t port = getRandomPort();
+    const std::string serviceName =
+            "_servustest_" + std::to_string( port ) + "._tcp";
+
+    servus::Servus service( serviceName );
+    const servus::qt::ItemModel model( service );
+
+    const QVariant invalidHeader = model.headerData( 0, Qt::Vertical,
+                                                     Qt::DisplayRole );
+    BOOST_CHECK( invalidHeader == QVariant( ));
+
+    const QModelIndex invalidIndex = model.index( 1, 1 );
+    BOOST_CHECK( invalidIndex == QModelIndex( ));
+    BOOST_CHECK( QModelIndex() == model.parent( invalidIndex ));
+}
+
+BOOST_AUTO_TEST_CASE( servusItemModel )
+{
+    const uint32_t port = getRandomPort();
+    const std::string serviceName =
+            "_servustest_" + std::to_string( port ) + "._tcp";
+
+    servus::Servus service( serviceName );
+    const servus::qt::ItemModel model( service );
+
+    WatchAdd watchAdd;
+    service.addListener( &watchAdd );
+
+    BOOST_CHECK_EQUAL( model.rowCount(), 0 );
+    BOOST_CHECK_EQUAL( model.columnCount(), 1 );
+    const std::string header = model.headerData( 0, Qt::Horizontal,
+                                     Qt::DisplayRole ).toString().toStdString();
+    BOOST_CHECK_EQUAL( header, "Instances for " + serviceName );
+    BOOST_CHECK( model.data( QModelIndex( )) == QVariant( ));
+
+    servus::Servus service2( serviceName );
+    const servus::Servus::Result& result = service2.announce( port,
+                                                              TEST_INSTANCE );
+    if( result != servus::Result::SUCCESS ) // happens on CI VMs
+    {
+        std::cerr << "Bailing, got " << result
+                  << ": looks like a broken zeroconf setup" << std::endl;
+        return;
+    }
+
+    service2.set( "foo", "bar" );
+
+    watchAdd.wait();
+    service.removeListener( &watchAdd );
+    if( !watchAdd.gotUpdate && getenv( "TRAVIS" ))
+    {
+        std::cerr << "Bailing, got no hosts on a Travis CI setup" << std::endl;
+        return;
+    }
+
+    BOOST_CHECK_EQUAL( model.rowCount(), 1 );
+    BOOST_CHECK_EQUAL( model.columnCount(), 1 );
+    const QModelIndex instanceIndex = model.index( 0, 0 );
+    BOOST_CHECK( model.parent( instanceIndex ) == QModelIndex( ));
+    BOOST_CHECK_EQUAL( model.data( instanceIndex ).toString().toStdString(),
+                       TEST_INSTANCE );
+    BOOST_CHECK( model.data( instanceIndex, Qt::UserRole ) == QVariant( ));
+    BOOST_REQUIRE_EQUAL( model.rowCount( instanceIndex ), 2 );
+    const QModelIndex kv1Index = model.index( 0, 0, instanceIndex );
+    BOOST_CHECK( model.parent( kv1Index ) == instanceIndex );
+    const QVariant kv1 = model.data( kv1Index );
+    const QVariant kv2 = model.data( model.index( 1, 0, instanceIndex ));
+    BOOST_REQUIRE_EQUAL( model.rowCount( kv1Index ), 0 );
+    BOOST_CHECK_EQUAL( kv1.toString().toStdString(),  "foo = bar" );
+    BOOST_CHECK( kv2.toString().startsWith( "servus_host = " ));
+
+    WatchRemove watchRemove;
+    service.addListener( &watchRemove );
+
+    service2.withdraw();
+
+    watchRemove.wait();
+    service.removeListener( &watchRemove );
+
+    BOOST_CHECK_EQUAL( model.rowCount(), 0 );
+}

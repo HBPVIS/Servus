@@ -1,5 +1,5 @@
 # Copyright (c) 2015, Human Brain Project
-#                     Juan Hernando <jhernando@fi.upm.es>
+#                     Daniel.Nachbaur@epfl.ch
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
 #
@@ -16,42 +16,10 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-set(SERVUS_PUBLIC_HEADERS
-  listener.h
-  result.h
-  servus.h
-  types.h
-  uint128_t.h
-  uri.h
-  )
-
-set(SERVUS_HEADERS
-  avahi/servus.h
-  dnssd/servus.h
-  none/servus.h
-  )
-
-set(SERVUS_SOURCES
-  md5/md5.cc
-  servus.cpp
-  uint128_t.cpp
-  uri.cpp
-  )
-
-list(APPEND SERVUS_LINK_LIBRARIES PRIVATE ${CMAKE_THREAD_LIBS_INIT})
-if(MSVC)
-  list(APPEND SERVUS_LINK_LIBRARIES ws2_32)
-endif()
-if(DNSSD_FOUND)
-  list(APPEND SERVUS_LINK_LIBRARIES ${DNSSD_LIBRARIES})
-endif()
-if(AVAHI-CLIENT_FOUND)
-  list(APPEND SERVUS_LINK_LIBRARIES ${avahi-client_LIBRARIES})
+if(NOT TARGET ServusQt)
+  return()
 endif()
 
-set(SERVUS_OMIT_LIBRARY_HEADER ON)
-common_library(Servus)
-
-if(Qt5Core_FOUND)
-  add_subdirectory(qt)
-endif()
+set(SERVUSBROWSER_SOURCES servusBrowser.cpp)
+set(SERVUSBROWSER_LINK_LIBRARIES ServusQt Qt5::Widgets)
+common_gui_application(servusBrowser)

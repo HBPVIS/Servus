@@ -20,7 +20,13 @@ if(NOT BOOST_FOUND)
   return()
 endif()
 
-set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Servus ${CMAKE_THREAD_LIBS_INIT})
+set(TEST_LIBRARIES
+  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Servus ${CMAKE_THREAD_LIBS_INIT})
+
+if(TARGET ServusQt)
+  list(APPEND TEST_LIBRARIES Qt5::Core ServusQt)
+else()
+  set(EXCLUDE_FROM_TESTS itemModel.cpp)
+endif()
 
 include(CommonCTest)
-
