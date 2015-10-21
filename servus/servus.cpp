@@ -18,7 +18,11 @@
 
 #include "servus.h"
 
+#include "listener.h"
+
+#include <cstring>
 #include <map>
+#include <unordered_set>
 
 // for NI_MAXHOST
 #ifdef _WIN32
@@ -28,7 +32,6 @@
 #  include <unistd.h>
 #endif
 
-#include <string.h>
 
 namespace servus
 {
@@ -39,6 +42,7 @@ namespace detail
 static const std::string empty_;
 typedef std::map< std::string, std::string > ValueMap;
 typedef std::map< std::string, ValueMap > InstanceMap;
+typedef std::unordered_set< Listener* > Listeners;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
 
@@ -75,7 +79,7 @@ public:
     }
 
     virtual servus::Servus::Result announce( const unsigned short port,
-                                               const std::string& instance ) =0;
+                                             const std::string& instance ) =0;
     virtual void withdraw() = 0;
     virtual bool isAnnounced() const = 0;
 
@@ -140,6 +144,18 @@ public:
         return j->second;
     }
 
+    void addListener( Listener* listener )
+    {
+        if( listener )
+            _listeners.insert( listener );
+    }
+
+    void removeListener( Listener* listener )
+    {
+        if( listener )
+             _listeners.erase( listener );
+    }
+
     void getData( servus::Servus::Data& data ) const
     {
         data = _instanceMap;
@@ -149,6 +165,7 @@ protected:
     const std::string _name;
     InstanceMap _instanceMap; //!< last discovered data
     ValueMap _data;   //!< self data to announce
+    Listeners _listeners;
 
     virtual void _updateRecord() = 0;
 };
@@ -311,6 +328,16 @@ const std::string& Servus::get( const std::string& instance,
                                 const std::string& key ) const
 {
     return _impl->get( instance, key );
+}
+
+void Servus::addListener( Listener* listener )
+{
+    _impl->addListener( listener );
+}
+
+void Servus::removeListener( Listener* listener )
+{
+    _impl->removeListener( listener );
 }
 
 void Servus::getData( Data& data )

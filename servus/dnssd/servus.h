@@ -51,10 +51,10 @@ public:
     std::string getClassName() const { return "dnssd"; }
 
     servus::Servus::Result announce( const unsigned short port,
-                                       const std::string& instance ) final
+                                     const std::string& instance ) final
     {
         if( _out )
-            return servus::Servus::Result( servus::Servus::Result::PENDING);
+            return servus::Servus::Result( servus::Servus::Result::PENDING );
 
         TXTRecordRef record;
         _createTXTRecord( record );
@@ -96,7 +96,7 @@ public:
         const ::servus::Servus::Interface addr ) final
     {
         if( _in )
-            return servus::Servus::Result( servus::Servus::Result::PENDING);
+            return servus::Servus::Result( servus::Servus::Result::PENDING );
 
         _instanceMap.clear();
         return _browse( addr );
@@ -189,7 +189,7 @@ private:
     }
 
     servus::Servus::Result _handleEvents( DNSServiceRef service,
-                                            const int32_t timeout = -1 )
+                                          const int32_t timeout = -1 )
     {
         assert( service );
         if( !service )
@@ -314,7 +314,11 @@ private:
             }
         }
         else // dns_sd.h: callback with the Add flag NOT set indicates a Remove
+        {
             _instanceMap.erase( name );
+            for( Listener* listener : _listeners )
+                listener->instanceRemoved( name );
+        }
     }
 
     static void resolveCBS_( DNSServiceRef, DNSServiceFlags,
@@ -349,6 +353,8 @@ private:
             values[ key ] = std::string( value, valueLen );
             ++i;
         }
+        for( Listener* listener : _listeners )
+            listener->instanceAdded( _browsedName );
     }
 };
 }

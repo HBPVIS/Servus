@@ -24,7 +24,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
 include(GitExternal)
 
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "1")
+set(VERSION_MINOR "2")
 set(VERSION_PATCH "0")
 set(VERSION_ABI 2)
 
@@ -39,10 +39,17 @@ else()
   common_package(DNSSD)
 endif()
 common_package(Boost 1.51 COMPONENTS unit_test_framework)
+common_package(Qt5Core)
+common_package(Qt5Widgets)
 common_package(Threads REQUIRED)
 common_package_post()
 
+if(Qt5Core_FOUND)
+  set(SERVUS_DEPENDENT_LIBRARIES Qt5Core)
+endif()
+
 add_subdirectory(servus)
+add_subdirectory(apps)
 add_subdirectory(tests)
 
 include(CPackConfig)

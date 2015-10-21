@@ -1,6 +1,5 @@
 /* Copyright (c) 2015, Human Brain Project
- *                     Stefan.Eilemann@epfl.ch
- *                     Juan Hernando <jhernando@fi.upm.es>
+ *                     Daniel.Nachbaur@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -18,43 +17,41 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef SERVUS_TYPES_H
-#define SERVUS_TYPES_H
-
-#include <sys/types.h>
-#ifndef _MSC_VER
-#  include <stdint.h>
-#endif
-#ifdef _WIN32
-#  include <basetsd.h>
-#  ifdef _MSC_VER
-typedef UINT64 uint64_t;
-typedef INT64 int64_t;
-typedef UINT32 uint32_t;
-typedef INT32 int32_t;
-typedef UINT16 uint16_t;
-typedef INT16 int16_t;
-typedef UINT8 uint8_t;
-typedef INT8 int8_t;
-#    ifndef HAVE_SSIZE_T
-typedef SSIZE_T ssize_t;
-#      define HAVE_SSIZE_T
-#    endif
-#  endif // Win32, Visual C++
-#endif // Win32
-
-#include <vector>
-#include <string>
+#ifndef SERVUS_LISTENER_H
+#define SERVUS_LISTENER_H
 
 namespace servus
 {
 
-class Listener;
-class Servus;
-class URI;
-class uint128_t;
+/**
+ * A listener interface which can be implemented to listen on changes of a
+ * Servus instance.
+ *
+ * @version 1.2
+ */
+class Listener
+{
+public:
+    virtual ~Listener() {}
 
-typedef std::vector< std::string > Strings;
+    /**
+     * Called after a new instance was added after being discovered.
+     *
+     * @param instance the name of the new instance
+     * @version 1.2
+     */
+    virtual void instanceAdded( const std::string& instance ) = 0;
+
+    /**
+     * Called after an instance was removed from the list of discovered
+     * instances.
+     *
+     * @param instance the name of the instance that was removed.
+     * @version 1.2
+     */
+    virtual void instanceRemoved( const std::string& instance ) = 0;
+};
+
 }
 
-#endif
+#endif // SERVUS_LISTENER_H
