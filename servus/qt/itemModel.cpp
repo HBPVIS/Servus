@@ -186,6 +186,13 @@ QVariant ItemModel::data( const QModelIndex& index_, const int role ) const
     {
     case Qt::DisplayRole:
         return item->objectName();
+    case Qt::ToolTipRole:
+    case Qt::UserRole:
+        if( item->children().isEmpty( ))
+            return QVariant();
+        return QString::fromStdString(
+                    _impl->service.get( item->objectName().toStdString(),
+                                        "servus_host" ));
     default:
         return QVariant();
     }

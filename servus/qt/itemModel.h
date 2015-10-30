@@ -95,7 +95,8 @@ public:
      * Mandatory override of QAbstractItemModel::data.
      *
      * If index points to an instance item, the returned data for
-     * Qt::DisplayRole will be the instance name. If index points to a
+     * Qt::DisplayRole will be the instance name, and for Qt::ToolTipRole and
+     * Qt::UserRole the data will be the hostname. If index points to a
      * key-value item, the returned data for Qt::DisplayRole will be a string in
      * the format "key = value". For any other index and/or role, the returned
      * data will be QVariant().
