@@ -177,10 +177,14 @@ BOOST_AUTO_TEST_CASE( servusItemModel )
     BOOST_CHECK( model.parent( instanceIndex ) == QModelIndex( ));
     BOOST_CHECK_EQUAL( model.data( instanceIndex ).toString().toStdString(),
                        TEST_INSTANCE );
-    BOOST_CHECK( model.data( instanceIndex, Qt::UserRole ) == QVariant( ));
+    BOOST_CHECK_EQUAL(
+             model.data( instanceIndex, Qt::UserRole ).toString().toStdString(),
+             service.get( TEST_INSTANCE, "servus_host") );
+    BOOST_CHECK( model.data( instanceIndex, Qt::EditRole ) == QVariant( ));
     BOOST_REQUIRE_EQUAL( model.rowCount( instanceIndex ), 2 );
     const QModelIndex kv1Index = model.index( 0, 0, instanceIndex );
     BOOST_CHECK( model.parent( kv1Index ) == instanceIndex );
+    BOOST_CHECK( model.data( kv1Index, Qt::UserRole ) == QVariant( ));
     const QVariant kv1 = model.data( kv1Index );
     const QVariant kv2 = model.data( model.index( 1, 0, instanceIndex ));
     BOOST_REQUIRE_EQUAL( model.rowCount( kv1Index ), 0 );
