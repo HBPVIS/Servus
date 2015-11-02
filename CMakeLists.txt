@@ -28,7 +28,9 @@ set(VERSION_MINOR "2")
 set(VERSION_PATCH "0")
 set(VERSION_ABI 2)
 
-set(SERVUS_DESCRIPTION "A small set of network oriented utilities in C++ including a zeroconf implementation.")
+set(SERVUS_DESCRIPTION "C++ network oriented utilities including a zeroconf implementation.")
+set(SERVUS_MAINTAINER "Human Brain Project <HBPVis@googlegroups.com>")
+set(CPACK_PACKAGE_LICENSE LGPL)
 set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
 
 include(Common)
