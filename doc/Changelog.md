@@ -3,6 +3,8 @@
 
 # git master {#master}
 
+* Add a function to get the host corresponding to a given instance.
+
 # Release 1.2 (02-11-2015) {#Release010200}
 
 * Added a new library ServusQt: Provides servus::qt::ItemModel which implements
