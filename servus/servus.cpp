@@ -318,6 +318,11 @@ Strings Servus::getKeys( const std::string& instance ) const
     return _impl->getKeys( instance );
 }
 
+const std::string& Servus::getHost( const std::string& instance ) const
+{
+    return get( instance, "servus_host" );
+}
+
 bool Servus::containsKey( const std::string& instance,
                           const std::string& key ) const
 {

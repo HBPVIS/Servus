@@ -191,8 +191,7 @@ QVariant ItemModel::data( const QModelIndex& index_, const int role ) const
         if( item->children().isEmpty( ))
             return QVariant();
         return QString::fromStdString(
-                    _impl->service.get( item->objectName().toStdString(),
-                                        "servus_host" ));
+                   _impl->service.getHost( item->objectName().toStdString( )));
     default:
         return QVariant();
     }
