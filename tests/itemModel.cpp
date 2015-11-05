@@ -112,7 +112,7 @@ public:
     }
 };
 
-BOOST_GLOBAL_FIXTURE( GlobalQtApp )
+BOOST_GLOBAL_FIXTURE( GlobalQtApp );
 
 BOOST_AUTO_TEST_CASE( invalidAccess )
 {
