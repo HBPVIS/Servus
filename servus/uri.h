@@ -50,6 +50,9 @@ namespace detail { class URI; }
  * Queries are parsed into key-value pairs and can be accessed using
  * findQuery(), queryBegin() and queryEnd().
  *
+ * We enforce schemas to have the separator "://", not only ":" which is enough
+ * for the RFC specification.
+ *
  * Example: @include tests/uri.cpp
  */
 class URI

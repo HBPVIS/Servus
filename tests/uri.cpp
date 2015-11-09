@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     BOOST_CHECK_EQUAL( userHostURI.getPort(), 0 );
     BOOST_CHECK_EQUAL( userHostURI.getAuthority(), "alice@hostname" );
 
-    const servus::URI uppercaseURI( "FOO:" );
+    const servus::URI uppercaseURI( "FOO://" );
     BOOST_CHECK_EQUAL( uppercaseURI.getScheme(), "foo" );
 
     servus::URI noauthority( "scheme:///path" );
@@ -145,20 +145,6 @@ BOOST_AUTO_TEST_CASE(test_file_uris)
     BOOST_CHECK_EQUAL( file5.getScheme(), "scheme" );
     BOOST_CHECK( file5.getQuery().empty( ));
     BOOST_CHECK( file5.getFragment().empty( ));
-
-    servus::URI path1( "foo:/bla.txt" );
-    BOOST_CHECK( path1.getHost().empty( ));
-    BOOST_CHECK_EQUAL( path1.getPath(), "/bla.txt" );
-    BOOST_CHECK_EQUAL( path1.getScheme(), "foo" );
-    BOOST_CHECK( path1.getQuery().empty( ));
-    BOOST_CHECK( path1.getFragment().empty( ));
-
-    servus::URI path2( "foo:bla.txt" );
-    BOOST_CHECK( path2.getHost().empty( ));
-    BOOST_CHECK_EQUAL( path2.getPath(), "bla.txt" );
-    BOOST_CHECK_EQUAL( path2.getScheme(), "foo" );
-    BOOST_CHECK( path2.getQuery().empty( ));
-    BOOST_CHECK( path2.getFragment().empty( ));
 }
 
 BOOST_AUTO_TEST_CASE(test_uri_query)
@@ -210,11 +196,11 @@ BOOST_AUTO_TEST_CASE(test_uri_comparisons)
 
 BOOST_AUTO_TEST_CASE(test_invalid_uri)
 {
-    BOOST_CHECK_THROW( servus::URI uri( "bad_schema:" ),
+    BOOST_CHECK_THROW( servus::URI uri( "bad_schema://" ),
                        std::exception );
-    BOOST_CHECK_THROW( servus::URI uri( "8ad-schema:" ),
+    BOOST_CHECK_THROW( servus::URI uri( "8ad-schema://" ),
                        std::exception );
-    BOOST_CHECK_NO_THROW( servus::URI uri( "g00d-sch+ma:" ));
+    BOOST_CHECK_NO_THROW( servus::URI uri( "g00d-sch+ma://" ));
     BOOST_CHECK_THROW( servus::URI uri( "http://host:port" ),
                        std::exception );
     BOOST_CHECK_THROW( servus::URI uri( "http://host:" ),
@@ -281,5 +267,24 @@ BOOST_AUTO_TEST_CASE(test_print)
     uri.setFragment( "fragment" );
     BOOST_CHECK_EQUAL( std::to_string( uri ),
                        "foo://user@localhost:1024/path?key=value#fragment" );
+}
 
+BOOST_AUTO_TEST_CASE(test_host_port_without_schema)
+{
+    const servus::URI uri( "host:12345" );
+    BOOST_CHECK_EQUAL( uri.getHost(), "" );
+    BOOST_CHECK_EQUAL( uri.getPort(), 0 );
+    BOOST_CHECK_EQUAL( uri.getPath(), "host:12345" );
+
+    servus::URI uri2;
+    uri2.setHost( "host" );
+    uri2.setPort( 12345 );
+    BOOST_CHECK( uri2.getScheme().empty( ));
+    BOOST_CHECK_EQUAL( uri2.getHost(), "host" );
+    BOOST_CHECK_EQUAL( uri2.getPort(), 12345 );
+
+    const servus::URI uri3( uri2 );
+    BOOST_CHECK( uri3.getScheme().empty( ));
+    BOOST_CHECK_EQUAL( uri3.getHost(), "host" );
+    BOOST_CHECK_EQUAL( uri3.getPort(), 12345 );
 }
