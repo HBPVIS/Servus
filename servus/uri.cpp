@@ -80,7 +80,7 @@ private:
     std::stringstream _error;
 };
 
-enum URIPart { SCHEME = 0, AUTHORITY, PATH, QUERY, FRAGMENT, HIERARCHY };
+enum URIPart { SCHEME = 0, AUTHORITY, PATH, QUERY, FRAGMENT };
 
 bool _parseURIPart( std::string& input, const URIPart& part,
                     std::string& output )
@@ -88,12 +88,14 @@ bool _parseURIPart( std::string& input, const URIPart& part,
 #ifndef NDEBUG
     const char requireFirst[] = { 0, 0, 0, '?', '#' };
 #endif
-    const char* const separators[] = { ":", "/?#", "?#", "#", "" };
+    const char* const separators[] = { "://", "/?#", "?#", "#", "" };
     const char* const disallowed[] = { "/?#", 0, 0, 0, 0 };
+    const bool fullSeparator[] = { true, false, false, false, false };
     const bool needsSeparator[] = { true, false, false, false, false };
     const size_t skip[] = { 0, 0, 0, 1, 1 };
-    const size_t postSkip[] = { 1, 0, 0, 0, 0 };
-    const size_t pos = input.find_first_of( separators[part] );
+    const size_t postSkip[] = { 3, 0, 0, 0, 0 };
+    const size_t pos = fullSeparator[part] ? input.find( separators[part] )
+                                      : input.find_first_of( separators[part] );
 
     if( pos == std::string::npos )
     {
@@ -194,9 +196,8 @@ public:
 private:
     URIData _uriData;
 
-    void _parseURI( const std::string& uri )
+    void _parseURI( std::string input )
     {
-        std::string input = uri;
         URIPart part = SCHEME;
         while( !input.empty( ))
         {
@@ -213,24 +214,11 @@ private:
                 {
                     throw std::invalid_argument("");
                 }
-                part = _uriData.scheme == "file" || _uriData.scheme.empty() ?
-                       PATH : HIERARCHY;
+                part = _uriData.scheme == "file" ? PATH : AUTHORITY;
                 // from http://en.wikipedia.org/wiki/File_URI_scheme:
                 //  "file:///foo.txt" is okay, while "file://foo.txt"
                 // is not, although some interpreters manage to handle
                 // the latter. We are "some".
-                if( _uriData.scheme == "file" && input.substr( 0, 2 ) == "//" )
-                    input = input.substr( 2 );
-                break;
-            case HIERARCHY:
-                // Distinguishing <path> from <authority path>
-                if( input.substr( 0, 2 ) == "//" )
-                {
-                    part = AUTHORITY;
-                    input = input.substr( 2 );
-                }
-                else
-                    part = PATH;
                 break;
             case AUTHORITY:
             {
@@ -279,6 +267,7 @@ URI::URI( const URI& from )
     : _impl( new detail::URI( *from._impl ))
 {
 }
+
 servus::URI::~URI()
 {
     delete _impl;

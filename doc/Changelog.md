@@ -4,6 +4,7 @@
 # git master {#master}
 
 * Add a function to get the host corresponding to a given instance.
+* Add support to parse "host:port" URIs
 
 # Release 1.2 (02-11-2015) {#Release010200}
 
