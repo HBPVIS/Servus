@@ -4,6 +4,7 @@
 # git master {#master}
 
 * Add a function to get the host corresponding to a given instance.
+* Fix schema parsing in servus::URI: must be schema://, not only schema:
 
 # Release 1.2 (02-11-2015) {#Release010200}
 
