@@ -58,7 +58,7 @@ class Watchdog
 {
 public:
     Watchdog()
-        : gotUpdate( false )
+        : gotUpdate( ATOMIC_VAR_INIT( false ))
     {}
 
     void wait()
