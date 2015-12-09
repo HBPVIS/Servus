@@ -134,7 +134,13 @@ void _parseAuthority( URIData& data, const std::string& auth )
     const size_t colonPos =
         auth.find_first_of( ':', hostPos );
     if( colonPos != std::string::npos )
-        data.port = std::stoi( auth.substr( colonPos + 1 ));
+    {
+        const std::string port = auth.substr( colonPos + 1 );
+        char* end = 0;
+        data.port = ::strtol( port.c_str(), &end, 10 );
+        if( port.empty() || end != port.c_str() + port.length( ))
+            throw std::runtime_error( port + " is not a valid port number" );
+    }
     // Works regardless of colonPos == npos
     data.host = auth.substr( hostPos, colonPos - hostPos );
     if( data.host.empty( ))
@@ -392,12 +398,12 @@ void URI::addQuery( const std::string& key, const std::string& value )
 
     // Rebuild fragment string
     data.query.clear();
-    for( const auto& pair : data.queryMap )
+    for( URI::ConstKVIter i = queryBegin(); i != queryEnd(); ++i )
     {
         if( data.query.empty( ))
-            data.query = pair.first + "=" + pair.second;
+            data.query = i->first + "=" + i->second;
         else
-            data.query += std::string( "," ) + pair.first + "=" + pair.second;
+            data.query += std::string( "," ) + i->first + "=" + i->second;
     }
 }
 

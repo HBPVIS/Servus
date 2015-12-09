@@ -2,7 +2,7 @@
 //          modification of MD5.
 
 // Translation and modification (c) 1995 by Mordechai T. Abzug
-//                                  2012-2014, Stefan Eilemann <eile@eyescale.ch>
+//                             2012-2015, Stefan Eilemann <eile@eyescale.ch>
 
 // This translation/ modification is provided "as is," without express or
 // implied warranty of any kind.
@@ -47,6 +47,8 @@ documentation and/or software.
 #ifdef _WIN32
 #  include <basetsd.h>
    typedef UINT64 uint64_t;
+#else
+#  include <stdint.h>
 #endif
 
 namespace md5

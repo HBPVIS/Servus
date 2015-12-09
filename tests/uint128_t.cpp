@@ -27,12 +27,15 @@
 #include <boost/unordered_map.hpp>
 #include <boost/functional/hash.hpp>
 #include <iostream>
-#include <mutex>
-#include <random>
-#include <thread>
+
+#ifndef COMMON_USE_CXX03
+#  include <mutex>
+#  include <random>
+#  include <thread>
+const size_t N_THREADS = 10;
+#endif
 
 const size_t N_UUIDS = 10000;
-const size_t N_THREADS = 10;
 
 typedef boost::unordered_map< servus::uint128_t, bool > TestHash;
 namespace boost
@@ -50,34 +53,7 @@ template<> struct hash< servus::uint128_t >
 void testConvertUint128ToUUID();
 void testIncrement();
 
-class Thread
-{
-public:
-    void run()
-    {
-        size_t i = N_UUIDS;
-
-        while( i-- )
-        {
-            const servus::uint128_t uuid = servus::make_UUID();
-            {
-                // Boost.Test is not thread safe
-                std::unique_lock< std::mutex > lock( _mutex );
-                BOOST_CHECK( uuid.isUUID( ));
-                BOOST_CHECK( hash.find( uuid ) == hash.end( ));
-            }
-            hash[ uuid ] = true;
-        }
-    }
-
-    TestHash hash;
-
-private:
-    static std::mutex _mutex;
-};
-std::mutex Thread::_mutex;
-
-BOOST_AUTO_TEST_CASE(test_basic)
+BOOST_AUTO_TEST_CASE(basic)
 {
     servus::uint128_t id1 = servus::make_UUID();
     servus::uint128_t id2;
@@ -112,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_basic)
 
     const servus::uint128_t& empty = servus::make_uint128( "" );
     const servus::uint128_t& fox = servus::make_uint128(
-                               "The quick brown fox jumps over the lazy dog." );
+        "The quick brown fox jumps over the lazy dog." );
     // Values from http://en.wikipedia.org/wiki/MD5#MD5_hashes
     BOOST_CHECK( empty != fox );
     BOOST_CHECK_EQUAL( empty, servus::uint128_t( 0xD41D8CD98F00B204ull,
@@ -125,12 +101,9 @@ BOOST_AUTO_TEST_CASE(test_basic)
         std::string( "The quick brown fox jumps over the lazy dog." ));
     BOOST_CHECK_EQUAL( fox, stringFox );
 
-    std::random_device device;
-    std::mt19937 engine( device( ));
-    std::uniform_int_distribution< uint64_t > generator;
-
-    const uint16_t high = generator( engine );
-    const int32_t low = generator( engine );
+    const servus::uint128_t random = servus::make_UUID();
+    const uint16_t high = random.high();
+    const int32_t low = random.low();
     id6 = servus::uint128_t( high, low );
     BOOST_CHECK_EQUAL( id6.high(), high );
     BOOST_CHECK_EQUAL( id6.low(), uint64_t( low ));
@@ -148,7 +121,35 @@ BOOST_AUTO_TEST_CASE(test_basic)
     BOOST_CHECK_EQUAL( id6.low(), 0xE9800998ECF8427Eull );
 }
 
-BOOST_AUTO_TEST_CASE(test_perf_test)
+#ifndef COMMON_USE_CXX03
+class Thread
+{
+public:
+    void run()
+    {
+        size_t i = N_UUIDS;
+
+        while( i-- )
+        {
+            const servus::uint128_t uuid = servus::make_UUID();
+            {
+                // Boost.Test is not thread safe
+                std::unique_lock< std::mutex > lock( _mutex );
+                BOOST_CHECK( uuid.isUUID( ));
+                BOOST_CHECK( hash.find( uuid ) == hash.end( ));
+            }
+            hash[ uuid ] = true;
+        }
+    }
+
+    TestHash hash;
+
+private:
+    static std::mutex _mutex;
+};
+std::mutex Thread::_mutex;
+
+BOOST_AUTO_TEST_CASE(concurrent)
 {
     Thread maps[ N_THREADS ];
     std::thread threads[ N_THREADS ];
@@ -188,9 +189,9 @@ BOOST_AUTO_TEST_CASE(test_perf_test)
         }
     }
 }
+#endif
 
-
-BOOST_AUTO_TEST_CASE(test_convert_uint128_to_uuid)
+BOOST_AUTO_TEST_CASE(convert_uint128_to_uuid)
 {
     const uint64_t low = 1212;
     const uint64_t high = 2314;
@@ -205,40 +206,33 @@ BOOST_AUTO_TEST_CASE(test_convert_uint128_to_uuid)
     BOOST_CHECK_EQUAL( compare128, test128 );
 }
 
-BOOST_AUTO_TEST_CASE(test_increment)
+BOOST_AUTO_TEST_CASE(increment)
 {
-    {
-        servus::uint128_t test128( 0, 0 );
-        ++test128;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(), 1 );
-        --test128;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(), 0 );
-        test128 = test128 + 1;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(), 1 );
-        test128 = test128 - 1;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(), 0 );
-    }
+    servus::uint128_t test128( 0, 0 );
+    ++test128;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), 1 );
+    --test128;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), 0 );
+    test128 = test128 + 1;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), 1 );
+    test128 = test128 - 1;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), 0 );
 
-    {
-        servus::uint128_t test128( 0, std::numeric_limits<uint64_t>::max() );
-        ++test128;
-        BOOST_CHECK_EQUAL( test128.high(), 1 );
-        BOOST_CHECK_EQUAL( test128.low(), 0 );
-        --test128;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(),
-                           std::numeric_limits< uint64_t >::max( ));
-        test128 = test128 + 1;
-        BOOST_CHECK_EQUAL( test128.high(), 1 );
-        BOOST_CHECK_EQUAL( test128.low(), 0 );
-        test128 = test128 - 1;
-        BOOST_CHECK_EQUAL( test128.high(), 0 );
-        BOOST_CHECK_EQUAL( test128.low(),
-                           std::numeric_limits< uint64_t >::max( ));
-
-    }
+    test128 = servus::uint128_t( 0, std::numeric_limits<uint64_t>::max() );
+    ++test128;
+    BOOST_CHECK_EQUAL( test128.high(), 1 );
+    BOOST_CHECK_EQUAL( test128.low(), 0 );
+    --test128;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), std::numeric_limits< uint64_t >::max( ));
+    test128 = test128 + 1;
+    BOOST_CHECK_EQUAL( test128.high(), 1 );
+    BOOST_CHECK_EQUAL( test128.low(), 0 );
+    test128 = test128 - 1;
+    BOOST_CHECK_EQUAL( test128.high(), 0 );
+    BOOST_CHECK_EQUAL( test128.low(), std::numeric_limits< uint64_t >::max( ));
 }
