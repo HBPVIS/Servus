@@ -48,6 +48,10 @@ endif()
 if(AVAHI-CLIENT_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES ${avahi-client_LIBRARIES})
 endif()
+if(COMMON_USE_CXX03)
+  list(APPEND SERVUS_LINK_LIBRARIES ${Boost_SYSTEM_LIBRARY}
+    ${Boost_CHRONO_LIBRARY})
+endif()
 
 set(SERVUS_OMIT_LIBRARY_HEADER ON)
 common_library(Servus)

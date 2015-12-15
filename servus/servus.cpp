@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2012-2015, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -22,7 +23,11 @@
 
 #include <cstring>
 #include <map>
-#include <unordered_set>
+#ifdef COMMON_USE_CXX03
+#  include <set>
+#else
+#  include <unordered_set>
+#endif
 
 // for NI_MAXHOST
 #ifdef _WIN32
@@ -31,7 +36,6 @@
 #  include <netdb.h>
 #  include <unistd.h>
 #endif
-
 
 namespace servus
 {
@@ -42,9 +46,14 @@ namespace detail
 static const std::string empty_;
 typedef std::map< std::string, std::string > ValueMap;
 typedef std::map< std::string, ValueMap > InstanceMap;
-typedef std::unordered_set< Listener* > Listeners;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
+
+#ifdef COMMON_USE_CXX03
+typedef std::set< Listener* > Listeners;
+#else
+typedef std::unordered_set< Listener* > Listeners;
+#endif
 
 class Servus
 {
@@ -366,8 +375,8 @@ std::ostream& operator << ( std::ostream& os, const Servus& servus )
        << servus._impl->getClassName();
 
     const Strings& keys = servus.getKeys();
-    for( auto key : keys )
-        os << std::endl << "    " << key << " = " << servus.get( key );
+    for( Strings::const_iterator i = keys.begin(); i != keys.end(); ++i )
+        os << std::endl << "    " << *i << " = " << servus.get( *i );
 
     return os;
 }

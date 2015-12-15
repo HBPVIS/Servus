@@ -21,6 +21,7 @@
 #ifndef SERVUS_TYPES_H
 #define SERVUS_TYPES_H
 
+#include <servus/defines.h>
 #include <sys/types.h>
 #ifndef _MSC_VER
 #  include <stdint.h>
@@ -45,6 +46,15 @@ typedef SSIZE_T ssize_t;
 
 #include <vector>
 #include <string>
+
+#ifdef COMMON_USE_CXX03
+#  ifndef final
+#    define final
+#  endif
+#  ifndef override
+#    define override
+#  endif
+#endif
 
 namespace servus
 {

@@ -348,21 +348,12 @@ SERVUS_API uint128_t make_UUID();
 #  define SERVUS_HASH_NAMESPACE_CLOSE }
 #  define SERVUS_HASH_USE_STRUCT
 #  include <functional>
-#elif defined __clang__ || defined __xlC__
+#elif defined __clang__ || defined __xlC__ || defined __GNUC__
 // C++03 with clang and xlC
 #  define SERVUS_HASH_NAMESPACE_OPEN namespace std { namespace tr1 {
 #  define SERVUS_HASH_NAMESPACE_CLOSE }}
 #  define SERVUS_HASH_USE_STRUCT
 #  include <tr1/unordered_set>
-#elif __GNUC__
-// C++03 with gcc and icc
-#  define SERVUS_HASH_NAMESPACE_OPEN namespace __gnu_cxx {
-#  define SERVUS_HASH_NAMESPACE_CLOSE }
-#  define SERVUS_HASH_USE_STRUCT
-// I didn't found a better way to get rid of the unwanted warning
-#  define _GLIBCXX_PERMIT_BACKWARD_HASH
-#  include <ext/hash_set> // Needed for hash< uint64_t >
-#  undef _GLIBCXX_PERMIT_BACKWARD_HASHH
 #elif _MSC_VER < 1600
 // C++03 with MSVC
 #  define SERVUS_HASH_NAMESPACE_OPEN namespace std {

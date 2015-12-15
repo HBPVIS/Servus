@@ -21,26 +21,48 @@
 
 #include <servus/servus.h>
 
-#include <random>
-#include <thread>
+#ifdef COMMON_USE_CXX03
+#  include <boost/random.hpp>
+#  include <boost/lexical_cast.hpp>
+    namespace rnd=boost::random;
+#else
+#  include <random>
+    namespace rnd=std;
+#endif
 
 #ifdef SERVUS_USE_DNSSD
 #  include <dns_sd.h>
 #endif
 
+#ifdef _MSC_VER
+#  define sleep Sleep
+#endif
 
 uint16_t getRandomPort()
 {
-    static std::random_device device;
-    static std::minstd_rand engine( device( ));
-    std::uniform_int_distribution< uint16_t > generator( 1024, 65535u );
+#ifdef COMMON_USE_CXX03
+    static rnd::minstd_rand engine;
+#else
+    static rnd::random_device device;
+    static rnd::minstd_rand engine( device( ));
+#endif
+    rnd::uniform_int_distribution< uint16_t > generator( 1024u, 65535u );
     return generator( engine );
+}
+
+template< class T > std::string toString( const T& what )
+{
+#ifdef COMMON_USE_CXX03
+    return boost::lexical_cast< std::string >( what );
+#else
+    return std::to_string( what );
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_servus)
 {
     const uint32_t port = getRandomPort();
-    std::string serviceName = "_servustest_" + std::to_string( port ) + "._tcp";
+    std::string serviceName = "_servustest_" + toString( port ) + "._tcp";
 
     try
     {
@@ -60,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     servus::Servus service( serviceName );
     const servus::Servus::Result& result = service.announce( port,
-                                    std::to_string( port ));
+                                                        toString( port ));
 
     BOOST_CHECK_EQUAL( service.getName(), serviceName );
 
@@ -84,7 +106,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     service.withdraw();
     service.set( "foo", "bar" );
-    BOOST_CHECK( service.announce( port, std::to_string( port )));
+    BOOST_CHECK( service.announce( port, toString( port )));
 
     servus::Strings hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
     if( hosts.empty() && getenv( "TRAVIS" ))
@@ -94,12 +116,12 @@ BOOST_AUTO_TEST_CASE(test_servus)
     }
 
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
-    BOOST_CHECK_EQUAL( hosts.front(), std::to_string( port ));
+    BOOST_CHECK_EQUAL( hosts.front(), toString( port ));
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 200 ));
+    ::sleep( 1 );
 
     service.set( "foobar", "42" );
-    std::this_thread::sleep_for( std::chrono::milliseconds( 2000 ));
+    ::sleep( 2 );
 
     hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
@@ -123,12 +145,12 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     { // test updates during browsing
         servus::Servus service2( serviceName );
-        BOOST_CHECK( service2.announce( port+1, std::to_string( port+1 )));
+        BOOST_CHECK( service2.announce( port+1, toString( port+1 )));
         BOOST_CHECK( service.browse( 2000 ));
         hosts = service.getInstances();
         BOOST_CHECK_EQUAL( hosts.size(), 2 );
     }
-    std::this_thread::sleep_for( std::chrono::milliseconds( 500 ));
+    ::sleep( 1 );
 
     BOOST_CHECK( service.browse( 2000 ));
     hosts = service.getInstances();

@@ -26,8 +26,20 @@
 #include <net/if.h>
 #include <stdexcept>
 
-#include <mutex>
 #include <cassert>
+
+#ifdef COMMON_USE_CXX03
+#  include <boost/chrono.hpp>
+#  include <boost/thread/mutex.hpp>
+    using boost::mutex;
+    typedef boost::unique_lock< mutex > ScopedLock;
+    namespace chrono = boost::chrono;
+#else
+#  include <mutex>
+    using std::mutex;
+    typedef std::unique_lock< mutex > ScopedLock;
+    namespace chrono = std::chrono;
+#endif
 
 #define WARN std::cerr << __FILE__ << ":" << __LINE__ << ": "
 
@@ -35,13 +47,14 @@
 //   Proper way of doing this is using the threaded polling in avahi
 namespace
 {
-static std::mutex _mutex;
+static mutex _mutex;
 
-template< typename T >
-int64_t _elapsedMilliseconds( const T& startTime )
+int64_t _elapsedMilliseconds(
+    const chrono::high_resolution_clock::time_point& startTime )
 {
-    const auto endTime = std::chrono::high_resolution_clock::now();
-    return std::chrono::nanoseconds( endTime - startTime ).count() / 1000000;
+    const chrono::high_resolution_clock::time_point& endTime =
+        chrono::high_resolution_clock::now();
+    return chrono::nanoseconds( endTime - startTime ).count() / 1000000;
 }
 
 }
@@ -54,7 +67,7 @@ namespace
 {
 AvahiSimplePoll* _newSimplePoll()
 {
-    std::unique_lock< std::mutex > lock( _mutex );
+    ScopedLock lock( _mutex );
     return avahi_simple_poll_new();
 }
 }
@@ -77,7 +90,7 @@ public:
             throw std::runtime_error( "Can't setup avahi poll device" );
 
         int error = 0;
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         _client = avahi_client_new( avahi_simple_poll_get( _poll ),
                                     (AvahiClientFlags)(0), _clientCBS, this,
                                     &error );
@@ -92,7 +105,7 @@ public:
         withdraw();
         endBrowsing();
 
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         if( _client )
             avahi_client_free( _client );
         if( _poll )
@@ -105,7 +118,7 @@ public:
                                      const std::string& instance ) final
     {
 
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
 
         _result = servus::Servus::Result::PENDING;
         _port = port;
@@ -118,7 +131,8 @@ public:
             _createServices();
         else
         {
-            const auto startTime = std::chrono::high_resolution_clock::now();
+            const chrono::high_resolution_clock::time_point& startTime =
+                chrono::high_resolution_clock::now();
             while( !_announcable &&
                    _result == servus::Servus::Result::PENDING &&
                    _elapsedMilliseconds( startTime ) < ANNOUNCE_TIMEOUT )
@@ -132,7 +146,7 @@ public:
 
     void withdraw() final
     {
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         _announce.clear();
         _port = 0;
         if( _group )
@@ -141,7 +155,7 @@ public:
 
     bool isAnnounced() const final
     {
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         return ( _group && !avahi_entry_group_is_empty( _group ));
     }
 
@@ -151,7 +165,7 @@ public:
         if( _browser )
             return servus::Servus::Result( servus::Servus::Result::PENDING );
 
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         _scope = addr;
         _instanceMap.clear();
         _result = servus::Servus::Result::SUCCESS;
@@ -170,9 +184,10 @@ public:
 
     servus::Servus::Result browse( const int32_t timeout ) final
     {
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         _result = servus::Servus::Result::PENDING;
-        const auto startTime = std::chrono::high_resolution_clock::now();
+        const chrono::high_resolution_clock::time_point& startTime =
+            chrono::high_resolution_clock::now();
 
         do
         {
@@ -192,7 +207,7 @@ public:
 
     void endBrowsing() final
     {
-        std::unique_lock< std::mutex > lock( _mutex );
+        ScopedLock lock( _mutex );
         if( _browser )
             avahi_service_browser_free( _browser );
         _browser = 0;
@@ -259,9 +274,8 @@ private:
             // The server records are now being established. This might be
             // caused by a host name change. We need to wait for our own records
             // to register until the host name is properly established.
-            throw std::runtime_error( std::string( "Unimplemented: " ) +
-                                      __FILE__ + ":" +
-                                      std::to_string( __LINE__ ));
+            throw std::runtime_error(
+                "Unimplemented AVAHI_CLIENT_S_REGISTERING event" );
             // withdraw & _createServices ?
             break;
 
@@ -312,8 +326,11 @@ private:
 
         case AVAHI_BROWSER_REMOVE:
             _instanceMap.erase( name );
-            for( Listener* listener : _listeners )
-                listener->instanceRemoved( name );
+            for( detail::Listeners::iterator i = _listeners.begin();
+                 i != _listeners.end(); ++i )
+            {
+                (*i)->instanceRemoved( name );
+            }
             break;
 
         case AVAHI_BROWSER_ALL_FOR_NOW:
@@ -376,8 +393,11 @@ private:
                     const std::string value = entry.substr( pos + 1 );
                     values[ key ] = value;
                 }
-                for( Listener* listener : _listeners )
-                    listener->instanceAdded( name );
+                for( detail::Listeners::iterator i = _listeners.begin();
+                     i != _listeners.end(); ++i )
+                {
+                    (*i)->instanceAdded( name );
+                }
             } break;
         }
 
