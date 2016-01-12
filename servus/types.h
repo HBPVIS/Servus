@@ -1,6 +1,6 @@
-/* Copyright (c) 2015, Human Brain Project
- *                     Stefan.Eilemann@epfl.ch
- *                     Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2015-2016, Human Brain Project
+ *                          Stefan.Eilemann@epfl.ch
+ *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -60,6 +60,7 @@ namespace servus
 {
 
 class Listener;
+class Serializable;
 class Servus;
 class URI;
 class uint128_t;
