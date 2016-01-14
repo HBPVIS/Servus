@@ -19,6 +19,7 @@
 set(SERVUS_PUBLIC_HEADERS
   listener.h
   result.h
+  serializable.h
   servus.h
   types.h
   uint128_t.h
@@ -33,6 +34,7 @@ set(SERVUS_HEADERS
 
 set(SERVUS_SOURCES
   md5/md5.cc
+  serializable.cpp
   servus.cpp
   uint128_t.cpp
   uri.cpp
