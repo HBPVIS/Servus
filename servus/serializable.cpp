@@ -19,8 +19,15 @@
 
 #include "serializable.h"
 
+#include "uint128_t.h"
+
 namespace servus
 {
+uint128_t Serializable::getTypeIdentifier() const
+{
+    return make_uint128( getTypeName( ));
+}
+
 Serializable::ChangeFunc Serializable::setUpdatedFunction(
     const ChangeFunc& func )
 {
