@@ -42,6 +42,9 @@ public:
         size_t size; //!< The size of the binary serialization
     };
 
+    /** @return the class name of this serializable. */
+    virtual std::string getTypeName() const = 0;
+
     /** @return the universally unique identifier of this serializable. */
     virtual uint128_t getTypeIdentifier() const = 0;
 
