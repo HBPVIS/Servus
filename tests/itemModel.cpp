@@ -31,7 +31,7 @@
 #include <servus/qt/itemModel.h>
 
 const std::string TEST_INSTANCE = "testInstance";
-const size_t DISCOVER_TIMEOUT = 5 /*seconds*/;
+const size_t DISCOVER_TIMEOUT = 15 /*seconds*/;
 
 uint16_t getRandomPort()
 {
