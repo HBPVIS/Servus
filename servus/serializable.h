@@ -34,6 +34,8 @@ class Serializable
 public:
     virtual ~Serializable() {}
 
+    /** @name Serialization methods */
+    //@{
     /** Pointer + size wrapper for binary serialization. */
     struct Data
     {
@@ -75,7 +77,10 @@ public:
 
     /** @return the JSON representation of this object. */
     std::string toJSON() const { return _toJSON(); }
+    //@}
 
+    /** @name Change Notifications */
+    //@{
     /** Function for change notification. */
     typedef std::function< void() > ChangeFunc;
 
@@ -98,9 +103,15 @@ public:
     SERVUS_API void notifyUpdated() const;
     /** @internal used by ZeroEQ to invoke updated function */
     SERVUS_API void notifyRequested() const;
+    //@}
 
 protected:
-    /** @name API for serializable sub classes. */
+    /**
+     * @name API for serializable sub classes.
+     *
+     * Endian-safe and 64-bit safe binary encoding is the responsability of the
+     * subclass implementation, if needed.
+     */
     //@{
     virtual bool _fromBinary( const void* /*data*/, const size_t /*size*/ )
         { throw std::runtime_error( "Binary deserialization not implemented" );}
