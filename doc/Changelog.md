@@ -3,10 +3,16 @@
 
 # git master {#master}
 
-* Add a function to get the host corresponding to a given instance.
-* Fix schema parsing in servus::URI: must be schema://, not only schema:
+# Release 1.3 (07-03-2015)
 
-# Release 1.2 (02-11-2015) {#Release010200}
+* [34](https://github.com/HBPVis/Servus/pull/34):
+  Serializable interface for zeq::http::Server
+* [31](https://github.com/HBPVis/Servus/pull/31):
+  Fix schema parsing in servus::URI: must be schema://, not only schema:
+* [28](https://github.com/HBPVis/Servus/pull/28):
+  Add a function to get the host corresponding to a given instance.
+
+# Release 1.2 (02-11-2015)
 
 * Added a new library ServusQt: Provides servus::qt::ItemModel which implements
   QAbstractItemModel to use it for any item view provided by Qt. Available only
@@ -15,16 +21,16 @@
   only if Qt5::Widgets was found during build.
 * Fix deadlock on Windows in servus::make_UUID()
 
-# Release 1.1 (07-07-2015) {#Release010100}
+# Release 1.1 (07-07-2015)
 
 * Added the function URI::getAuthority
 * Added some URI setters.
 * Build fixes for gcc 4.9.2 and MSVC.
 
-# Release 1.0.1 (29-05-2015) {#Release010010}
+# Release 1.0.1 (29-05-2015)
 
 * Fixed URI parsing for URI without authority.
 
-# Release 1.0 (21-05-2015) {#Release010000}
+# Release 1.0 (21-05-2015)
 
 * Initial version.
