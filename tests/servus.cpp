@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     servus::Servus service( serviceName );
     const servus::Servus::Result& result = service.announce( port,
-                                                        toString( port ));
+                                                             toString( port ));
 
     BOOST_CHECK_EQUAL( service.getName(), serviceName );
 
@@ -106,6 +106,8 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     service.withdraw();
     service.set( "foo", "bar" );
+    BOOST_CHECK_EQUAL( service.get( "foo" ), "bar" );
+    BOOST_CHECK_EQUAL( service.get( "bar" ), std::string( ));
     BOOST_CHECK( service.announce( port, toString( port )));
 
     servus::Strings hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
@@ -117,10 +119,14 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( hosts.front(), toString( port ));
+    BOOST_CHECK( service.containsKey( hosts.front(), "foo" ));
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
+    BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
+    BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), std::string( ));
     ::sleep( 1 );
 
     service.set( "foobar", "42" );
+
     ::sleep( 2 );
 
     hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
