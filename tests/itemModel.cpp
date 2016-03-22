@@ -22,24 +22,17 @@
 
 #include <atomic>
 #include <chrono>
-#include <random>
 
 #include <QApplication>
 
 #include <servus/listener.h>
 #include <servus/servus.h>
+#include <servus/uint128_t.h>
 #include <servus/qt/itemModel.h>
 
 const std::string TEST_INSTANCE = "testInstance";
 const size_t DISCOVER_TIMEOUT = 15 /*seconds*/;
 
-uint16_t getRandomPort()
-{
-    static std::random_device device;
-    static std::minstd_rand engine( device( ));
-    std::uniform_int_distribution< uint16_t > generator( 1024, 65535u );
-    return generator( engine );
-}
 
 struct GlobalQtApp
 {
@@ -116,9 +109,8 @@ BOOST_GLOBAL_FIXTURE( GlobalQtApp );
 
 BOOST_AUTO_TEST_CASE( invalidAccess )
 {
-    const uint32_t port = getRandomPort();
     const std::string serviceName =
-            "_servustest_" + std::to_string( port ) + "._tcp";
+            "_servustest_" + servus::make_UUID().getString() + "._tcp";
 
     servus::Servus service( serviceName );
     const servus::qt::ItemModel model( service );
@@ -134,9 +126,8 @@ BOOST_AUTO_TEST_CASE( invalidAccess )
 
 BOOST_AUTO_TEST_CASE( servusItemModel )
 {
-    const uint32_t port = getRandomPort();
     const std::string serviceName =
-            "_servustest_" + std::to_string( port ) + "._tcp";
+            "_servustest_" + servus::make_UUID().getString() + "._tcp";
 
     servus::Servus service( serviceName );
     const servus::qt::ItemModel model( service );
@@ -152,7 +143,7 @@ BOOST_AUTO_TEST_CASE( servusItemModel )
     BOOST_CHECK( model.data( QModelIndex( )) == QVariant( ));
 
     servus::Servus service2( serviceName );
-    const servus::Servus::Result& result = service2.announce( port,
+    const servus::Servus::Result& result = service2.announce( 0,
                                                               TEST_INSTANCE );
     if( result != servus::Result::SUCCESS ) // happens on CI VMs
     {
