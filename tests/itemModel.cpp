@@ -51,7 +51,11 @@ class Watchdog
 {
 public:
     Watchdog()
+#ifdef __APPLE__
+        : gotUpdate( false )
+#else
         : gotUpdate( ATOMIC_VAR_INIT( false ))
+#endif
     {}
 
     void wait()
