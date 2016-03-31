@@ -2,6 +2,8 @@
 # Changelog {#Changelog}
 
 # git master {#master}
+* [43](https://github.com/HBPVis/Servus/pull/43):
+  Allow URI queries without value
 
 # Release 1.3 (07-03-2015)
 

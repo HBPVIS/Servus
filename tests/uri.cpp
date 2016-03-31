@@ -1,5 +1,5 @@
-/* Copyright (c) 2013-2014, ahmet.bilgili@epfl.ch
- *                    2015, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2013-2016, Ahmet.Bilgili@epfl.ch
+ *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -23,7 +23,7 @@
 #include <servus/uri.h>
 
 
-BOOST_AUTO_TEST_CASE(test_uri_parts)
+BOOST_AUTO_TEST_CASE(uri_parts)
 {
     const std::string uriStr =
         "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(test_uri_parts)
     BOOST_CHECK_EQUAL( fragment.getFragment(), "fragment,no,query" );
 }
 
-BOOST_AUTO_TEST_CASE(test_setters)
+BOOST_AUTO_TEST_CASE(setters)
 {
     servus::URI uri;
     uri.setScheme( "foo" );
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(test_setters)
     // The query setter is tested independently.
 }
 
-BOOST_AUTO_TEST_CASE(test_empty_uri)
+BOOST_AUTO_TEST_CASE(empty_uri)
 {
     servus::URI empty;
     BOOST_CHECK( empty.getScheme().empty( ));
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(test_empty_uri)
     BOOST_CHECK( empty.getFragment().empty( ));
 }
 
-BOOST_AUTO_TEST_CASE(test_file_uris)
+BOOST_AUTO_TEST_CASE(file_uris)
 {
     servus::URI file1( "/bla.txt" );
     BOOST_CHECK_EQUAL( file1.getPath(), "/bla.txt" );
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(test_file_uris)
     BOOST_CHECK( file5.getFragment().empty( ));
 }
 
-BOOST_AUTO_TEST_CASE(test_uri_query)
+BOOST_AUTO_TEST_CASE(uri_query)
 {
     const std::string uriStr =
         "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(test_uri_query)
     BOOST_CHECK( uri.getQuery().find( "hans=dampf" ) != std::string::npos );
 }
 
-BOOST_AUTO_TEST_CASE(test_uri_comparisons)
+BOOST_AUTO_TEST_CASE(uri_comparisons)
 {
     const std::string uriStr =
         "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(test_uri_comparisons)
     BOOST_CHECK_EQUAL( sstr.str(), "/path" );
 }
 
-BOOST_AUTO_TEST_CASE(test_invalid_uri)
+BOOST_AUTO_TEST_CASE(invalid_uri)
 {
     BOOST_CHECK_THROW( servus::URI uri( "bad_schema://" ),
                        std::exception );
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_uri)
                        std::exception );
 }
 
-BOOST_AUTO_TEST_CASE(test_corner_cases)
+BOOST_AUTO_TEST_CASE(corner_cases)
 {
     servus::URI uri1( "path/foo:bar" );
     BOOST_CHECK_EQUAL( uri1.getPath(), "path/foo:bar" );
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(test_corner_cases)
     BOOST_CHECK_EQUAL( uri6.getHost(), "*" );
 }
 
-BOOST_AUTO_TEST_CASE(test_print)
+BOOST_AUTO_TEST_CASE(print)
 {
     servus::URI uri;
     BOOST_CHECK_EQUAL( std::to_string( uri ), "" );
@@ -269,7 +269,7 @@ BOOST_AUTO_TEST_CASE(test_print)
                        "foo://user@localhost:1024/path?key=value#fragment" );
 }
 
-BOOST_AUTO_TEST_CASE(test_host_port_without_schema)
+BOOST_AUTO_TEST_CASE(host_port_without_schema)
 {
     const servus::URI uri( "host:12345" );
     BOOST_CHECK_EQUAL( uri.getHost(), "" );
@@ -287,4 +287,14 @@ BOOST_AUTO_TEST_CASE(test_host_port_without_schema)
     BOOST_CHECK( uri3.getScheme().empty( ));
     BOOST_CHECK_EQUAL( uri3.getHost(), "host" );
     BOOST_CHECK_EQUAL( uri3.getPort(), 12345 );
+}
+
+BOOST_AUTO_TEST_CASE(query_without_value)
+{
+    const servus::URI uri( "?foo=,bar=foo,blubb" );
+    BOOST_CHECK( uri.findQuery( "foo" ) != uri.queryEnd( ));
+    BOOST_CHECK( uri.findQuery( "blubb" ) != uri.queryEnd( ));
+    BOOST_CHECK_EQUAL( uri.findQuery( "bar" )->second, "foo" );
+    BOOST_CHECK( uri.findQuery( "foo" )->second.empty( ));
+    BOOST_CHECK( uri.findQuery( "blubb" )->second.empty( ));
 }
