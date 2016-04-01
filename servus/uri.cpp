@@ -1,6 +1,6 @@
-/* Copyright (c) 2013-2015, Human Brain Project
+/* Copyright (c) 2013-2016, Human Brain Project
  *                          Ahmet.Bilgili@epfl.ch
- *                    2015, Juan Hernando <jhernando@fi.upm.es>
+ *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -167,9 +167,12 @@ void _parseQueryMap( URIData& data )
             query = query.substr( nextPair + 1 );
 
         const size_t eq = pair.find( '=' );
-        if( eq == std::string::npos || eq == 0 )
+        if( eq == 0 ) // empty key
             continue;
-        data.queryMap[ pair.substr( 0, eq ) ] = pair.substr( eq + 1 );
+        if( eq == std::string::npos ) // empty value
+            data.queryMap[ pair ] = std::string();
+        else
+            data.queryMap[ pair.substr( 0, eq ) ] = pair.substr( eq + 1 );
     }
 }
 

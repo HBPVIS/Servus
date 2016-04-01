@@ -75,7 +75,7 @@ public:
      */
     bool fromJSON( const std::string& json ) { return _fromJSON( json ); }
 
-    /** @return the JSON representation of this object. */
+    /** @return the JSON representation of this serializable. */
     std::string toJSON() const { return _toJSON(); }
     //@}
 
