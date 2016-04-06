@@ -16,30 +16,28 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(Servus)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+project(Servus VERSION 1.3.1)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
                               ${CMAKE_SOURCE_DIR}/CMake/common)
 include(GitExternal)
 
-set(VERSION_MAJOR "1")
-set(VERSION_MINOR "3")
-set(VERSION_PATCH "1")
-set(VERSION_ABI 3)
+set(Servus_VERSION_ABI 3)
 
 set(SERVUS_DESCRIPTION
   "C++ network oriented utilities including a zeroconf implementation")
 set(SERVUS_MAINTAINER "Human Brain Project <HBPVis@googlegroups.com>")
 set(CPACK_PACKAGE_LICENSE LGPL)
 set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
+set(SERVUS_DEB_DEPENDS libboost-test-dev avahi-daemon libavahi-client-dev)
 
 include(Common)
 
 if(LINUX)
-  common_package(avahi-client)
+  common_find_package(avahi-client)
 else()
-  common_package(DNSSD)
+  common_find_package(DNSSD)
 endif()
 if(COMMON_USE_CXX03)
   set(BOOST_COMPONENTS REQUIRED COMPONENTS unit_test_framework random system
@@ -47,11 +45,11 @@ if(COMMON_USE_CXX03)
 else()
   set(BOOST_COMPONENTS COMPONENTS unit_test_framework regex)
 endif()
-common_package(Boost 1.51 ${BOOST_COMPONENTS})
-common_package(Qt5Core)
-common_package(Qt5Widgets)
-common_package(Threads REQUIRED)
-common_package_post()
+common_find_package(Boost 1.51 ${BOOST_COMPONENTS})
+common_find_package(Qt5Core)
+common_find_package(Qt5Widgets)
+common_find_package(Threads REQUIRED)
+common_find_package_post()
 
 if(Qt5Core_FOUND)
   set(SERVUS_DEPENDENT_LIBRARIES Qt5Core)

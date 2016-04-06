@@ -23,7 +23,7 @@
 
 #include <cstring>
 #include <map>
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  include <set>
 #else
 #  include <unordered_set>
@@ -49,7 +49,7 @@ typedef std::map< std::string, ValueMap > InstanceMap;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 typedef std::set< Listener* > Listeners;
 #else
 typedef std::unordered_set< Listener* > Listeners;

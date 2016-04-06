@@ -23,7 +23,7 @@
 #include <servus/api.h>
 #include <servus/types.h>
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  include <boost/function/function0.hpp>
 #  include <boost/shared_ptr.hpp>
 #else
@@ -46,7 +46,7 @@ public:
     struct Data
     {
         Data() : size ( 0 ) {}
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
         boost::shared_ptr< const void > ptr; //!< ptr to the binary serialization
 #else
         std::shared_ptr< const void > ptr; //!< ptr to the binary serialization
@@ -92,7 +92,7 @@ public:
     /** @name Change Notifications */
     //@{
     /** Function for change notification. */
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
     typedef boost::function< void() > ChangeFunc;
 #else
     typedef std::function< void() > ChangeFunc;

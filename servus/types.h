@@ -47,7 +47,7 @@ typedef SSIZE_T ssize_t;
 #include <vector>
 #include <string>
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  ifndef final
 #    define final
 #  endif

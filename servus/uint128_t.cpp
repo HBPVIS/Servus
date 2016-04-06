@@ -20,7 +20,7 @@
 #include "uint128_t.h"
 #include "md5/md5.hh"
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  include <boost/random.hpp>
 #  include <boost/thread/mutex.hpp>
     namespace rnd=boost::random;
@@ -95,7 +95,7 @@ uint128_t make_UUID()
     uint128_t value;
     while( value.high() == 0 )
     {
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
         static rnd::mt19937_64 engine;
 #else
         static rnd::random_device device;
