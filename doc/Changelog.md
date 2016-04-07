@@ -2,11 +2,11 @@
 # Changelog {#Changelog}
 
 # git master {#master}
+
+# Release 1.3 (07-04-2016)
+
 * [43](https://github.com/HBPVis/Servus/pull/43):
   Allow URI queries without value
-
-# Release 1.3 (07-03-2015)
-
 * [34](https://github.com/HBPVis/Servus/pull/34):
   Serializable interface for zeq::http::Server
 * [31](https://github.com/HBPVis/Servus/pull/31):
