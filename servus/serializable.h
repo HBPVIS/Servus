@@ -22,8 +22,14 @@
 
 #include <servus/api.h>
 #include <servus/types.h>
-#include <functional> // function
-#include <memory> // shared_ptr
+
+#ifdef COMMON_USE_CXX03
+#  include <boost/function/function0.hpp>
+#  include <boost/shared_ptr.hpp>
+#else
+#  include <functional> // function
+#  include <memory> // shared_ptr
+#endif
 
 namespace servus
 {
@@ -40,7 +46,11 @@ public:
     struct Data
     {
         Data() : size ( 0 ) {}
+#ifdef COMMON_USE_CXX03
+        boost::shared_ptr< const void > ptr; //!< ptr to the binary serialization
+#else
         std::shared_ptr< const void > ptr; //!< ptr to the binary serialization
+#endif
         size_t size; //!< The size of the binary serialization
     };
 
@@ -82,7 +92,11 @@ public:
     /** @name Change Notifications */
     //@{
     /** Function for change notification. */
+#ifdef COMMON_USE_CXX03
+    typedef boost::function< void() > ChangeFunc;
+#else
     typedef std::function< void() > ChangeFunc;
+#endif
 
     /**
      * Set a new function called after the object has been updated.
