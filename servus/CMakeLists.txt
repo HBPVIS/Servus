@@ -19,6 +19,7 @@
 set(SERVUS_PUBLIC_HEADERS
   listener.h
   result.h
+  serializable.h
   servus.h
   types.h
   uint128_t.h
@@ -33,15 +34,11 @@ set(SERVUS_HEADERS
 
 set(SERVUS_SOURCES
   md5/md5.cc
+  serializable.cpp
   servus.cpp
   uint128_t.cpp
   uri.cpp
   )
-
-if(NOT COMMON_USE_CXX03)
-  list(APPEND SERVUS_PUBLIC_HEADERS serializable.h)
-  list(APPEND SERVUS_SOURCES serializable.cpp)
-endif()
 
 list(APPEND SERVUS_LINK_LIBRARIES PRIVATE ${CMAKE_THREAD_LIBS_INIT})
 if(MSVC)
@@ -61,6 +58,6 @@ endif()
 set(SERVUS_OMIT_LIBRARY_HEADER ON)
 common_library(Servus)
 
-if(Qt5Core_FOUND)
+if(Qt5Core_FOUND AND NOT COMMON_USE_CXX03)
   add_subdirectory(qt)
 endif()
