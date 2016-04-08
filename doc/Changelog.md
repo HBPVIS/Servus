@@ -3,6 +3,9 @@
 
 # git master {#master}
 
+* [43](https://github.com/HBPVis/Servus/pull/47):
+  Use standard '&' separator instead of ',' for KV pairs in URI query [RFC6570]
+
 # Release 1.3 (07-04-2016)
 
 * [43](https://github.com/HBPVis/Servus/pull/43):

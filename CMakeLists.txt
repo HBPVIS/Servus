@@ -25,7 +25,7 @@ include(GitExternal)
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "3")
-set(VERSION_PATCH "0")
+set(VERSION_PATCH "1")
 set(VERSION_ABI 3)
 
 set(SERVUS_DESCRIPTION

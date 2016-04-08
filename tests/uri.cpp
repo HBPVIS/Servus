@@ -26,7 +26,7 @@
 BOOST_AUTO_TEST_CASE(uri_parts)
 {
     const std::string uriStr =
-        "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
+        "http://bob@www.example.com:8080/path/?key=value&foo=bar#fragment";
     BOOST_REQUIRE_NO_THROW( servus::URI uri( uriStr ));
     servus::URI uri( uriStr );
 
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(uri_parts)
     BOOST_CHECK_EQUAL( uri.getPort(), 8080 );
     BOOST_CHECK_EQUAL( uri.getAuthority(), "bob@www.example.com:8080" );
     BOOST_CHECK_EQUAL( uri.getPath(), "/path/" );
-    BOOST_CHECK_EQUAL( uri.getQuery(), "key=value,foo=bar" );
+    BOOST_CHECK_EQUAL( uri.getQuery(), "key=value&foo=bar" );
     BOOST_CHECK_EQUAL( uri.getFragment(), "fragment" );
 
     const servus::URI hostPortURI( "foo://hostname:12345" );
@@ -150,26 +150,37 @@ BOOST_AUTO_TEST_CASE(file_uris)
 BOOST_AUTO_TEST_CASE(uri_query)
 {
     const std::string uriStr =
-        "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
+        "http://bob@www.example.com:8080/path/?key=value&list=10,53#fragment";
     servus::URI uri( uriStr );
 
-    BOOST_CHECK( uri.findQuery( "key" ) != uri.queryEnd( ));
-    BOOST_CHECK( uri.findQuery( "foo" ) != uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "key" ) != uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "list" ) != uri.queryEnd( ));
     BOOST_CHECK( uri.findQuery( "bar" ) == uri.queryEnd( ));
     BOOST_CHECK_EQUAL( uri.findQuery( "key" )->second, "value" );
-    BOOST_CHECK_EQUAL( uri.findQuery( "foo" )->second, "bar" );
+    BOOST_CHECK_EQUAL( uri.findQuery( "list" )->second, "10,53" );
 
     uri.addQuery( "hans", "dampf" );
+    BOOST_REQUIRE( uri.findQuery( "hans" ) != uri.queryEnd( ));
     BOOST_CHECK_EQUAL( uri.findQuery( "key" )->second, "value" );
-    BOOST_CHECK_EQUAL( uri.findQuery( "foo" )->second, "bar" );
+    BOOST_CHECK_EQUAL( uri.findQuery( "list" )->second, "10,53" );
     BOOST_CHECK_EQUAL( uri.findQuery( "hans" )->second, "dampf" );
     BOOST_CHECK( uri.getQuery().find( "hans=dampf" ) != std::string::npos );
+
+    uri.setQuery("firstkey=val1&secondkey=768");
+    BOOST_CHECK_EQUAL( uri.getQuery(), "firstkey=val1&secondkey=768" );
+    BOOST_CHECK( uri.findQuery( "key" ) == uri.queryEnd( ));
+    BOOST_CHECK( uri.findQuery( "list" ) == uri.queryEnd( ));
+    BOOST_CHECK( uri.findQuery( "hans" ) == uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "firstkey" ) != uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "secondkey" ) != uri.queryEnd( ));
+    BOOST_CHECK_EQUAL( uri.findQuery( "firstkey" )->second, "val1" );
+    BOOST_CHECK_EQUAL( uri.findQuery( "secondkey" )->second, "768" );
 }
 
 BOOST_AUTO_TEST_CASE(uri_comparisons)
 {
     const std::string uriStr =
-        "http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment";
+        "http://bob@www.example.com:8080/path/?key=value&foo=bar#fragment";
     servus::URI uri( uriStr );
 
     BOOST_CHECK( uri == uri );
@@ -177,9 +188,9 @@ BOOST_AUTO_TEST_CASE(uri_comparisons)
     BOOST_CHECK( uri != servus::URI(
                            "http://bob@www.example.com:8080/path/?key=value" ));
     BOOST_CHECK( uri != servus::URI(
-          "http://bob@www.example.com:8030/path/?key=value,foo=bar#fragment" ));
+          "http://bob@www.example.com:8030/path/?key=value&foo=bar#fragment" ));
     BOOST_CHECK( uri != servus::URI(
-                  "http://bob@foo.com:8080/path/?key=value,foo=bar#fragment" ));
+                  "http://bob@foo.com:8080/path/?key=value&foo=bar#fragment" ));
 
     std::stringstream sstr;
     sstr << uri;
@@ -291,9 +302,10 @@ BOOST_AUTO_TEST_CASE(host_port_without_schema)
 
 BOOST_AUTO_TEST_CASE(query_without_value)
 {
-    const servus::URI uri( "?foo=,bar=foo,blubb" );
-    BOOST_CHECK( uri.findQuery( "foo" ) != uri.queryEnd( ));
-    BOOST_CHECK( uri.findQuery( "blubb" ) != uri.queryEnd( ));
+    const servus::URI uri( "?foo=&bar=foo&blubb" );
+    BOOST_REQUIRE( uri.findQuery( "foo" ) != uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "bar" ) != uri.queryEnd( ));
+    BOOST_REQUIRE( uri.findQuery( "blubb" ) != uri.queryEnd( ));
     BOOST_CHECK_EQUAL( uri.findQuery( "bar" )->second, "foo" );
     BOOST_CHECK( uri.findQuery( "foo" )->second.empty( ));
     BOOST_CHECK( uri.findQuery( "blubb" )->second.empty( ));
