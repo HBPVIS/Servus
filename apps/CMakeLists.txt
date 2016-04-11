@@ -1,5 +1,5 @@
-# Copyright (c) 2015, Human Brain Project
-#                     Daniel.Nachbaur@epfl.ch
+# Copyright (c) 2015-2016, Human Brain Project
+#                          Daniel.Nachbaur@epfl.ch
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
 #
@@ -22,4 +22,4 @@ endif()
 
 set(SERVUSBROWSER_SOURCES servusBrowser.cpp)
 set(SERVUSBROWSER_LINK_LIBRARIES ServusQt Qt5::Widgets)
-common_gui_application(servusBrowser)
+common_application(servusBrowser GUI)
