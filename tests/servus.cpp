@@ -38,6 +38,14 @@
 #  define sleep Sleep
 #endif
 
+static int _getPropagationTime()
+{
+    if( getenv( "TRAVIS" ))
+        return 4;
+    return 1;
+}
+static const int _propagationTime = _getPropagationTime();
+
 uint16_t getRandomPort()
 {
 #ifdef COMMON_USE_CXX03
@@ -110,7 +118,8 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_CHECK_EQUAL( service.get( "bar" ), std::string( ));
     BOOST_CHECK( service.announce( port, toString( port )));
 
-    servus::Strings hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
+    servus::Strings hosts = service.discover( servus::Servus::IF_LOCAL,
+                                              _propagationTime * 1000 );
     if( hosts.empty() && getenv( "TRAVIS" ))
     {
         std::cerr << "Bailing, got no hosts on a Travis CI setup" << std::endl;
@@ -123,13 +132,14 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), std::string( ));
-    ::sleep( 1 );
+    ::sleep( _propagationTime );
 
     service.set( "foobar", "42" );
 
-    ::sleep( 2 );
+    ::sleep( _propagationTime );
 
-    hosts = service.discover( servus::Servus::IF_LOCAL, 2000 );
+    hosts = service.discover( servus::Servus::IF_LOCAL,
+                              _propagationTime * 1000 );
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), "42" );
     BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
@@ -143,7 +153,8 @@ BOOST_AUTO_TEST_CASE(test_servus)
                  servus::Servus::Result::PENDING );
     BOOST_CHECK( service.isBrowsing( ));
 
-    BOOST_CHECK_EQUAL( service.browse( 200 ), service.browse( 0 ));
+    BOOST_CHECK_EQUAL( service.browse( _propagationTime * 1000 ),
+                       service.browse( 0 ));
     hosts = service.getInstances();
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
@@ -152,13 +163,13 @@ BOOST_AUTO_TEST_CASE(test_servus)
     { // test updates during browsing
         servus::Servus service2( serviceName );
         BOOST_CHECK( service2.announce( port+1, toString( port+1 )));
-        BOOST_CHECK( service.browse( 2000 ));
+        BOOST_CHECK( service.browse( _propagationTime * 1000 ));
         hosts = service.getInstances();
         BOOST_CHECK_EQUAL( hosts.size(), 2 );
     }
-    ::sleep( 1 );
+    ::sleep( _propagationTime );
 
-    BOOST_CHECK( service.browse( 2000 ));
+    BOOST_CHECK( service.browse( _propagationTime * 1000 ));
     hosts = service.getInstances();
     BOOST_CHECK_EQUAL( hosts.size(), 1 );
 
