@@ -27,6 +27,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/regex.hpp>
+
 namespace servus
 {
 namespace
@@ -147,10 +149,22 @@ void _parseAuthority( URIData& data, const std::string& auth )
         throw std::invalid_argument("");
 }
 
+void _warnAboutLegacySeparator( const std::string& query )
+{
+    const boost::regex legacySeparator( "[^&]*,[^&]*=" );
+    if( boost::regex_search( query, legacySeparator ))
+        std::cerr << "servus::URI: Detected legacy ',' separator in query: \""
+                  << query << "\". Use '&' separator instead." << std::endl;
+}
+
 void _parseQueryMap( URIData& data )
 {
     // parse query data into key-value pairs
     std::string query = data.query;
+
+    // warn if a query uses the legacy ',' separator instead of '&'
+    _warnAboutLegacySeparator( query );
+
     data.queryMap.clear();
     while( !query.empty( ))
     {
