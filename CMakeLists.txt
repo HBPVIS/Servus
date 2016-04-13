@@ -25,7 +25,7 @@ include(GitExternal)
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "3")
-set(VERSION_PATCH "0")
+set(VERSION_PATCH "1")
 set(VERSION_ABI 3)
 
 set(SERVUS_DESCRIPTION
@@ -43,9 +43,9 @@ else()
 endif()
 if(COMMON_USE_CXX03)
   set(BOOST_COMPONENTS REQUIRED COMPONENTS unit_test_framework random system
-    thread chrono)
+    thread chrono regex)
 else()
-  set(BOOST_COMPONENTS COMPONENTS unit_test_framework)
+  set(BOOST_COMPONENTS COMPONENTS unit_test_framework regex)
 endif()
 common_package(Boost 1.51 ${BOOST_COMPONENTS})
 common_package(Qt5Core)

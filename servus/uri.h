@@ -31,9 +31,10 @@ namespace servus
 namespace detail { class URI; }
 
 /**
- * The URI class parses the given uri using the generic syntax from RFC3986.
+ * The URI class parses the given uri using the generic syntax from RFC3986 and
+ * RFC6570
  * @verbatim
- * http://bob@www.example.com:8080/path/?key=value,foo=bar#fragment
+ * http://bob@www.example.com:8080/path/?key=value&foo=bar#fragment
  * ^   ^  ^  ^               ^    ^     ^                 ^
  * a   b  c  d               e    f     g                 h
  *
@@ -43,7 +44,7 @@ namespace detail { class URI; }
  * host	[d, e)	"www.example.com"
  * port (e, f) 8080
  * path	[f, g)	"/path/"
- * query (g, h)	"key=value"
+ * query (g, h)	"key=value&foo=bar"
  * fragment	(h,-) "fragment"
  * @endverbatim
  *
@@ -111,6 +112,7 @@ public:
     SERVUS_API void setHost( const std::string& host );
     SERVUS_API void setPort( uint16_t port );
     SERVUS_API void setPath( const std::string& path );
+    SERVUS_API void setQuery( const std::string& query );
     SERVUS_API void setFragment( const std::string& fragment );
     //@}
 

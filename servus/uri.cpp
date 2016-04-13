@@ -27,6 +27,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/regex.hpp>
+
 namespace servus
 {
 namespace
@@ -147,13 +149,26 @@ void _parseAuthority( URIData& data, const std::string& auth )
         throw std::invalid_argument("");
 }
 
+void _warnAboutLegacySeparator( const std::string& query )
+{
+    const boost::regex legacySeparator( "[^&]*,[^&]*=" );
+    if( boost::regex_search( query, legacySeparator ))
+        std::cerr << "servus::URI: Detected legacy ',' separator in query: \""
+                  << query << "\". Use '&' separator instead." << std::endl;
+}
+
 void _parseQueryMap( URIData& data )
 {
     // parse query data into key-value pairs
     std::string query = data.query;
+
+    // warn if a query uses the legacy ',' separator instead of '&'
+    _warnAboutLegacySeparator( query );
+
+    data.queryMap.clear();
     while( !query.empty( ))
     {
-        const size_t nextPair = query.find( ',' );
+        const size_t nextPair = query.find( '&' );
         if( nextPair == 0 )
         {
             query = query.substr( 1 );
@@ -372,6 +387,13 @@ void URI::setPath( const std::string& path )
     _impl->getData().path = path;
 }
 
+void URI::setQuery( const std::string& query )
+{
+    URIData& data = _impl->getData();
+    data.query = query;
+    detail::_parseQueryMap( data );
+}
+
 void URI::setFragment( const std::string& fragment )
 {
     _impl->getData().fragment = fragment;
@@ -406,7 +428,7 @@ void URI::addQuery( const std::string& key, const std::string& value )
         if( data.query.empty( ))
             data.query = i->first + "=" + i->second;
         else
-            data.query += std::string( "," ) + i->first + "=" + i->second;
+            data.query += std::string( "&" ) + i->first + "=" + i->second;
     }
 }
 
