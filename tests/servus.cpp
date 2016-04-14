@@ -21,7 +21,7 @@
 
 #include <servus/servus.h>
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  include <boost/random.hpp>
 #  include <boost/lexical_cast.hpp>
     namespace rnd=boost::random;
@@ -48,7 +48,7 @@ static const int _propagationTime = _getPropagationTime();
 
 uint16_t getRandomPort()
 {
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
     static rnd::minstd_rand engine;
 #else
     static rnd::random_device device;
@@ -60,7 +60,7 @@ uint16_t getRandomPort()
 
 template< class T > std::string toString( const T& what )
 {
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
     return boost::lexical_cast< std::string >( what );
 #else
     return std::to_string( what );

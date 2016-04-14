@@ -28,7 +28,7 @@
 
 #include <cassert>
 
-#ifdef COMMON_USE_CXX03
+#ifdef SERVUS_USE_CXX03
 #  include <boost/chrono.hpp>
 #  include <boost/thread/mutex.hpp>
     using boost::mutex;

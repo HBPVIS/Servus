@@ -28,7 +28,7 @@
 #include <boost/functional/hash.hpp>
 #include <iostream>
 
-#ifndef COMMON_USE_CXX03
+#ifndef SERVUS_USE_CXX03
 #  include <mutex>
 #  include <random>
 #  include <thread>
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(basic)
     BOOST_CHECK_EQUAL( id6.low(), 0xE9800998ECF8427Eull );
 }
 
-#ifndef COMMON_USE_CXX03
+#ifndef SERVUS_USE_CXX03
 class Thread
 {
 public:
