@@ -3,6 +3,8 @@
 
 # git master {#master}
 
+* [52](https://github.com/HBPVis/Servus/pull/52):
+  Replace ChangeFunc by ChangeSignal in serializable
 * [43](https://github.com/HBPVis/Servus/pull/47):
   Use standard '&' separator instead of ',' for KV pairs in URI query [RFC6570]
 

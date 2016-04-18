@@ -34,7 +34,6 @@ set(SERVUS_HEADERS
 
 set(SERVUS_SOURCES
   md5/md5.cc
-  serializable.cpp
   servus.cpp
   uint128_t.cpp
   uri.cpp
