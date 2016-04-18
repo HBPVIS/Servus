@@ -20,14 +20,15 @@
 #ifndef SERVUS_SERIALIZABLE_H
 #define SERVUS_SERIALIZABLE_H
 
+#include "uint128_t.h"
+
 #include <servus/api.h>
 #include <servus/types.h>
 
+#include <boost/signals2.hpp>
 #ifdef SERVUS_USE_CXX03
-#  include <boost/function/function0.hpp>
 #  include <boost/shared_ptr.hpp>
 #else
-#  include <functional> // function
 #  include <memory> // shared_ptr
 #endif
 
@@ -58,7 +59,8 @@ public:
     virtual std::string getTypeName() const = 0;
 
     /** @return the universally unique identifier of this serializable. */
-    SERVUS_API virtual uint128_t getTypeIdentifier() const;
+    SERVUS_API virtual uint128_t getTypeIdentifier() const
+        { return make_uint128( getTypeName( )); }
 
     /**
      * Update this serializable from its binary representation.
@@ -91,32 +93,12 @@ public:
 
     /** @name Change Notifications */
     //@{
-    /** Function for change notification. */
-#ifdef SERVUS_USE_CXX03
-    typedef boost::function< void() > ChangeFunc;
-#else
-    typedef std::function< void() > ChangeFunc;
-#endif
+    typedef boost::signals2::signal< void() > ChangeSignal;
 
-    /**
-     * Set a new function called after the object has been updated.
-     *
-     * @return the previously set function.
-     */
-    SERVUS_API ChangeFunc setUpdatedFunction( const ChangeFunc& func );
-
-    /**
-     * Set a new function called when a request has been received.
-     *
-     * Invoked before the object is published.
-     * @return the previously set function.
-     */
-    SERVUS_API ChangeFunc setRequestedFunction( const ChangeFunc& func );
-
-    /** @internal used by ZeroEQ to invoke updated function */
-    SERVUS_API void notifyUpdated() const;
-    /** @internal used by ZeroEQ to invoke updated function */
-    SERVUS_API void notifyRequested() const;
+    //! Signal to emit after the object has been updated
+    ChangeSignal updated;
+    //! Signal to emit when a request has been received
+    ChangeSignal requested;
     //@}
 
 protected:
@@ -137,10 +119,6 @@ protected:
     virtual std::string _toJSON() const
         { throw std::runtime_error( "JSON serialization not implemented" ); }
     //@}
-
-private:
-    ChangeFunc _updated;
-    ChangeFunc _requested;
 };
 
 }
