@@ -38,7 +38,8 @@ namespace servus
 class Serializable
 {
 public:
-    virtual ~Serializable() {}
+    Serializable();
+    virtual ~Serializable();
 
     /** @name Serialization methods */
     //@{
@@ -64,10 +65,8 @@ public:
      * Update this serializable from its binary representation.
      * @return true on success, false on error.
      */
-    bool fromBinary( const Data& data )
-        { return _fromBinary( data.ptr.get(), data.size ); }
-    bool fromBinary( const void* data, const size_t size )
-        { return _fromBinary( data, size ); }
+    SERVUS_API bool fromBinary( const Data& data );
+    SERVUS_API bool fromBinary( const void* data, const size_t size );
 
     /**
      * Get a binary representation of this object.
@@ -77,49 +76,55 @@ public:
      *
      * @return the binary representation of this object.
      */
-    Data toBinary() const { return _toBinary(); }
+    SERVUS_API Data toBinary() const;
 
     /**
      * Update this serializable from its JSON representation.
      * @return true on success, false on error.
      */
-    bool fromJSON( const std::string& json ) { return _fromJSON( json ); }
+    SERVUS_API bool fromJSON( const std::string& json );
 
     /** @return the JSON representation of this serializable. */
-    std::string toJSON() const { return _toJSON(); }
+    SERVUS_API std::string toJSON() const;
     //@}
 
     /** @name Change Notifications */
     //@{
-    /** Function for change notification. */
+    /** Callbacks for change notifications. */
 #ifdef SERVUS_USE_CXX03
-    typedef boost::function< void() > ChangeFunc;
+    typedef boost::function< void() > DeserializedCallback;
+    typedef boost::function< void() > SerializeCallback;
 #else
-    typedef std::function< void() > ChangeFunc;
+    typedef std::function< void() > DeserializedCallback;
+    typedef std::function< void() > SerializeCallback;
 #endif
 
     /**
-     * Set a new function called after the object has been updated.
+     * Register a function called after the object has been updated remotely
+     * (via a subscriber, a http server, loading from file...).
+     * Only one callback is supported at the moment, to deregister the callback,
+     * call this function with a 'nullptr' (or 0) parameter.
      *
-     * @return the previously set function.
+     * @throw if a DeserializedCallback is already registered and the specified
+     * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API ChangeFunc setUpdatedFunction( const ChangeFunc& func );
+    SERVUS_API void registerDeserializedCallback(
+            const DeserializedCallback& callback );
 
     /**
-     * Set a new function called when a request has been received.
+     * Register a function to be called when the serializable object is about
+     * to be serialized.
+     * Only one callback is supported at the moment, to deregister the callback,
+     * call this function with a 'nullptr' (or 0) parameter.
      *
-     * Invoked before the object is published.
-     * @return the previously set function.
+     * @throw if a SerializedCallback is already registered and the specified
+     * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API ChangeFunc setRequestedFunction( const ChangeFunc& func );
-
-    /** @internal used by ZeroEQ to invoke updated function */
-    SERVUS_API void notifyUpdated() const;
-    /** @internal used by ZeroEQ to invoke updated function */
-    SERVUS_API void notifyRequested() const;
+    SERVUS_API void registerSerializeCallback(
+            const SerializeCallback& callback );
     //@}
 
-protected:
+private:
     /**
      * @name API for serializable sub classes.
      *
@@ -138,9 +143,15 @@ protected:
         { throw std::runtime_error( "JSON serialization not implemented" ); }
     //@}
 
-private:
-    ChangeFunc _updated;
-    ChangeFunc _requested;
+    Serializable( const Serializable& );
+    Serializable& operator=( const Serializable& );
+#ifdef SERVUS_USE_CXX11
+    Serializable( Serializable&& ) = delete;
+    Serializable& operator=( Serializable&& ) = delete;
+#endif
+
+    class Impl;
+    Impl* _impl;
 };
 
 }

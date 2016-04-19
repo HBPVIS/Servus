@@ -3,7 +3,9 @@
 
 # git master {#master}
 
-* [43](https://github.com/HBPVis/Servus/pull/47):
+* [53](https://github.com/HBPVis/Servus/pull/53):
+  Add notifyDeserialized and notifySerialize functions in serializable
+* [47](https://github.com/HBPVis/Servus/pull/47):
   Use standard '&' separator instead of ',' for KV pairs in URI query [RFC6570]
 
 # Release 1.3 (07-04-2016)

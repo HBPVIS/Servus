@@ -23,37 +23,96 @@
 
 namespace servus
 {
+
+class Serializable::Impl
+{
+public:
+    void notifyDeserialized() const
+    {
+        if( deserialized )
+            deserialized();
+    }
+
+    void notifySerialize() const
+    {
+        if( serialize )
+            serialize();
+    }
+
+    Serializable::DeserializedCallback deserialized;
+    Serializable::SerializeCallback serialize;
+};
+
+Serializable::Serializable()
+    : _impl( new Serializable::Impl( ))
+{}
+
+Serializable::~Serializable()
+{
+    delete _impl;
+}
+
 uint128_t Serializable::getTypeIdentifier() const
 {
     return make_uint128( getTypeName( ));
 }
 
-Serializable::ChangeFunc Serializable::setUpdatedFunction(
-    const ChangeFunc& func )
+bool Serializable::fromBinary( const Data& data )
 {
-    const ChangeFunc old = _updated;
-    _updated = func;
-    return old;
+    return fromBinary( data.ptr.get(), data.size );
 }
 
-Serializable::ChangeFunc Serializable::setRequestedFunction(
-    const ChangeFunc& func )
+bool Serializable::fromBinary( const void* data, const size_t size )
 {
-    const ChangeFunc old = _requested;
-    _requested = func;
-    return old;
+    if( _fromBinary( data, size ))
+    {
+        _impl->notifyDeserialized();
+        return true;
+    }
+    return false;
 }
 
-void Serializable::notifyUpdated() const
+Serializable::Data Serializable::toBinary() const
 {
-    if( _updated )
-        _updated();
+    _impl->notifySerialize();
+    return _toBinary();
 }
 
-void Serializable::notifyRequested() const
+bool Serializable::fromJSON( const std::string& json )
 {
-    if( _requested )
-        _requested();
+    if( _fromJSON( json ))
+    {
+        _impl->notifyDeserialized();
+        return true;
+    }
+    return false;
+}
+
+std::string Serializable::toJSON() const
+{
+    _impl->notifySerialize();
+    return _toJSON();
+}
+
+void Serializable::registerDeserializedCallback(
+        const DeserializedCallback& callback )
+{
+    if( _impl->deserialized && callback )
+        throw( std::runtime_error(
+                "A DeserializedCallback is already registered. "
+                "Only one is supported at the moment" ));
+
+    _impl->deserialized = callback;
+}
+
+void Serializable::registerSerializeCallback(
+        const SerializeCallback& callback )
+{
+    if( _impl->serialize && callback )
+        throw( std::runtime_error( "A SerializeCallback is already registered. "
+                                   "Only one is supported at the moment" ));
+
+    _impl->serialize = callback;
 }
 
 }
