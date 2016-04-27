@@ -18,12 +18,11 @@
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(Servus VERSION 1.3.1)
+set(Servus_VERSION_ABI 3)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
                               ${CMAKE_SOURCE_DIR}/CMake/common)
 include(GitExternal)
-
-set(Servus_VERSION_ABI 3)
 
 set(SERVUS_DESCRIPTION
   "C++ network oriented utilities including a zeroconf implementation")
