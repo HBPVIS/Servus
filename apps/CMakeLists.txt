@@ -22,4 +22,9 @@ endif()
 
 set(SERVUSBROWSER_SOURCES servusBrowser.cpp)
 set(SERVUSBROWSER_LINK_LIBRARIES ServusQt Qt5::Widgets)
+
+if(APPLE)
+common_application(ServusBrowser GUI)
+else()
 common_application(servusBrowser GUI)
+endif()
