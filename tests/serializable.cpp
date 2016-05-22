@@ -57,7 +57,8 @@ BOOST_AUTO_TEST_CASE(serializable_registerSerialize)
     BOOST_CHECK_THROW( obj.registerSerializeCallback( callback ),
                        std::runtime_error ); // callback already registered
 
-    BOOST_CHECK_NO_THROW( obj.registerSerializeCallback( 0 ));
+    BOOST_CHECK_NO_THROW( obj.registerSerializeCallback(
+        servus::Serializable::SerializeCallback( )));
     BOOST_CHECK_NO_THROW( obj.registerSerializeCallback( callback ));
 
     BOOST_CHECK_THROW( obj.registerSerializeCallback( callback ),
@@ -73,7 +74,8 @@ BOOST_AUTO_TEST_CASE(serializable_registerDeserialized)
     BOOST_CHECK_THROW( obj.registerDeserializedCallback( callback ),
                        std::runtime_error ); // callback already registered
 
-    BOOST_CHECK_NO_THROW( obj.registerDeserializedCallback( 0 ));
+    BOOST_CHECK_NO_THROW( obj.registerDeserializedCallback(
+        servus::Serializable::DeserializedCallback( )));
     BOOST_CHECK_NO_THROW( obj.registerDeserializedCallback( callback ));
 
     BOOST_CHECK_THROW( obj.registerDeserializedCallback( callback ),
