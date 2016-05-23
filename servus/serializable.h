@@ -38,8 +38,8 @@ namespace servus
 class Serializable
 {
 public:
-    Serializable();
-    virtual ~Serializable();
+    SERVUS_API Serializable();
+    SERVUS_API virtual ~Serializable();
 
     /** @name Serialization methods */
     //@{
