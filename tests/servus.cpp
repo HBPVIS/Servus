@@ -35,7 +35,10 @@
 #endif
 
 #ifdef _MSC_VER
-#  define sleep Sleep
+#  include <windows.h>
+#  define _sleep Sleep
+#else
+#  define _sleep ::sleep
 #endif
 
 static int _getPropagationTime()
@@ -132,11 +135,11 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), std::string( ));
-    ::sleep( _propagationTime );
+    _sleep( _propagationTime );
 
     service.set( "foobar", "42" );
 
-    ::sleep( _propagationTime );
+    _sleep( _propagationTime );
 
     hosts = service.discover( servus::Servus::IF_LOCAL,
                               _propagationTime * 1000 );
@@ -167,7 +170,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
         hosts = service.getInstances();
         BOOST_CHECK_EQUAL( hosts.size(), 2 );
     }
-    ::sleep( _propagationTime );
+    _sleep( _propagationTime );
 
     BOOST_CHECK( service.browse( _propagationTime * 1000 ));
     hosts = service.getInstances();
