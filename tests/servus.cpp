@@ -41,13 +41,8 @@
 #  define _sleep ::sleep
 #endif
 
-static int _getPropagationTime()
-{
-    if( getenv( "TRAVIS" ))
-        return 4;
-    return 1;
-}
-static const int _propagationTime = _getPropagationTime();
+static const int _propagationTime = 1000;
+static const int _propagationTries = 10;
 
 uint16_t getRandomPort()
 {
@@ -121,31 +116,49 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_CHECK_EQUAL( service.get( "bar" ), std::string( ));
     BOOST_CHECK( service.announce( port, toString( port )));
 
-    servus::Strings hosts = service.discover( servus::Servus::IF_LOCAL,
-                                              _propagationTime * 1000 );
-    if( hosts.empty() && getenv( "TRAVIS" ))
+    int nLoops = _propagationTries;
+    while( --nLoops )
     {
-        std::cerr << "Bailing, got no hosts on a Travis CI setup" << std::endl;
-        return;
-    }
+        const servus::Strings& hosts =
+            service.discover( servus::Servus::IF_LOCAL, _propagationTime );
+        if( hosts.empty() && nLoops > 1 )
+        {
+            if( getenv( "TRAVIS" ))
+            {
+                std::cerr << "Bailing, got no hosts on a Travis CI setup"
+                          << std::endl;
+                return;
+            }
+            continue;
+        }
 
-    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
-    BOOST_CHECK_EQUAL( hosts.front(), toString( port ));
-    BOOST_CHECK( service.containsKey( hosts.front(), "foo" ));
-    BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
-    BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
-    BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), std::string( ));
-    _sleep( _propagationTime );
+        BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
+        BOOST_CHECK_EQUAL( hosts.front(), toString( port ));
+        BOOST_CHECK( service.containsKey( hosts.front(), "foo" ));
+        BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
+        BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
+        BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ),
+                           std::string( ));
+        break;
+    }
 
     service.set( "foobar", "42" );
 
-    _sleep( _propagationTime );
+    nLoops = _propagationTries;
+    while( --nLoops )
+    {
+        const servus::Strings& hosts =
+            service.discover( servus::Servus::IF_LOCAL, _propagationTime );
+        const bool hasFoobar = !hosts.empty() &&
+                               service.containsKey( hosts.front(), "foobar" );
+        if(( hosts.empty() || !hasFoobar ) && nLoops > 1 )
+            continue;
 
-    hosts = service.discover( servus::Servus::IF_LOCAL,
-                              _propagationTime * 1000 );
-    BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
-    BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), "42" );
-    BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
+        BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
+        BOOST_CHECK_EQUAL( service.get( hosts.front(), "foobar" ), "42" );
+        BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
+        break;
+    }
 
     // continuous browse API
     BOOST_CHECK( !service.isBrowsing( ));
@@ -156,9 +169,9 @@ BOOST_AUTO_TEST_CASE(test_servus)
                  servus::Servus::Result::PENDING );
     BOOST_CHECK( service.isBrowsing( ));
 
-    BOOST_CHECK_EQUAL( service.browse( _propagationTime * 1000 ),
+    BOOST_CHECK_EQUAL( service.browse( _propagationTime ),
                        service.browse( 0 ));
-    hosts = service.getInstances();
+    servus::Strings hosts = service.getInstances();
     BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
     BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.getKeys().size(), 2 );
@@ -166,15 +179,32 @@ BOOST_AUTO_TEST_CASE(test_servus)
     { // test updates during browsing
         servus::Servus service2( serviceName );
         BOOST_CHECK( service2.announce( port+1, toString( port+1 )));
-        BOOST_CHECK( service.browse( _propagationTime * 1000 ));
-        hosts = service.getInstances();
-        BOOST_CHECK_EQUAL( hosts.size(), 2 );
-    }
-    _sleep( _propagationTime );
 
-    BOOST_CHECK( service.browse( _propagationTime * 1000 ));
-    hosts = service.getInstances();
-    BOOST_CHECK_EQUAL( hosts.size(), 1 );
+
+        nLoops = _propagationTries;
+        while( --nLoops )
+        {
+            BOOST_CHECK( service.browse( _propagationTime ));
+            hosts = service.getInstances();
+            if( hosts.size() < 2 && nLoops > 1 )
+                continue;
+
+            BOOST_CHECK_EQUAL( hosts.size(), 2 );
+            break;
+        }
+    }
+
+    nLoops = _propagationTries;
+    while( --nLoops )
+    {
+        BOOST_CHECK( service.browse( _propagationTime ));
+        hosts = service.getInstances();
+        if( hosts.size() > 1 && nLoops > 1 )
+            continue;
+
+        BOOST_CHECK_EQUAL( hosts.size(), 1 );
+        break;
+    }
 
     BOOST_CHECK( service.isBrowsing( ));
     service.endBrowsing();
