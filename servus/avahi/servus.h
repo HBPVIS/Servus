@@ -189,10 +189,14 @@ public:
         const chrono::high_resolution_clock::time_point& startTime =
             chrono::high_resolution_clock::now();
 
+        size_t nErrors = 0;
         do
         {
             if( avahi_simple_poll_iterate( _poll, timeout ) != 0 )
             {
+                if( ++nErrors < 10 )
+                    continue;
+
                 _result = servus::Servus::Result::POLL_ERROR;
                 break;
             }

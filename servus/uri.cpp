@@ -66,20 +66,20 @@ class uri_parse : public std::exception
 public:
     explicit uri_parse( const std::string& uri )
     {
-        _error << "Error parsing URI string: " << uri << std::endl;
+        _error = std::string( "Error parsing URI string: " ) + uri;
     }
 
     uri_parse( const uri_parse& excep )
     {
-        _error << excep._error.str();
+        _error = excep._error;
     }
 
     virtual ~uri_parse() throw() {}
 
-    virtual const char* what() const throw() { return _error.str().c_str(); }
+    virtual const char* what() const throw() { return _error.c_str(); }
 
 private:
-    std::stringstream _error;
+    std::string _error;
 };
 
 enum URIPart { SCHEME = 0, AUTHORITY, PATH, QUERY, FRAGMENT };
