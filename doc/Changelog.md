@@ -1,7 +1,7 @@
 
 # Changelog {#Changelog}
 
-# git master {#master}
+# Release 1.4 (30-06-2016)
 
 * [53](https://github.com/HBPVis/Servus/pull/53):
   Add notifyDeserialized and notifySerialize functions in serializable
