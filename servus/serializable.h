@@ -124,6 +124,14 @@ public:
             const SerializeCallback& callback );
     //@}
 
+protected:
+    SERVUS_API Serializable( const Serializable& );
+    SERVUS_API Serializable& operator=( const Serializable& );
+#ifdef SERVUS_USE_CXX11
+    SERVUS_API Serializable( Serializable&& );
+    SERVUS_API Serializable& operator=( Serializable&& );
+#endif
+
 private:
     /**
      * @name API for serializable sub classes.
@@ -142,13 +150,6 @@ private:
     virtual std::string _toJSON() const
         { throw std::runtime_error( "JSON serialization not implemented" ); }
     //@}
-
-    Serializable( const Serializable& );
-    Serializable& operator=( const Serializable& );
-#ifdef SERVUS_USE_CXX11
-    Serializable( Serializable&& ) = delete;
-    Serializable& operator=( Serializable&& ) = delete;
-#endif
 
     class Impl;
     Impl* _impl;
