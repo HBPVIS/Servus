@@ -52,6 +52,31 @@ Serializable::~Serializable()
     delete _impl;
 }
 
+Serializable::Serializable( const Serializable& rhs )
+    : _impl( new Serializable::Impl( *rhs._impl ))
+{}
+
+Serializable& Serializable::operator=( const Serializable& rhs )
+{
+    if( this != &rhs )
+        *_impl = *rhs._impl;
+    return *this;
+}
+
+#ifdef SERVUS_USE_CXX11
+Serializable::Serializable( Serializable&& rhs )
+    : _impl( nullptr )
+{
+    std::swap( _impl, rhs._impl );
+}
+
+Serializable& Serializable::operator=( Serializable&& rhs )
+{
+    std::swap( _impl, rhs._impl );
+    return *this;
+}
+#endif
+
 uint128_t Serializable::getTypeIdentifier() const
 {
     return make_uint128( getTypeName( ));
