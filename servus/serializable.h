@@ -61,6 +61,9 @@ public:
     /** @return the universally unique identifier of this serializable. */
     SERVUS_API virtual uint128_t getTypeIdentifier() const;
 
+    /** @return the description of the objects' data layout. */
+    virtual std::string getSchema() const { return std::string(); }
+
     /**
      * Update this serializable from its binary representation.
      * @return true on success, false on error.

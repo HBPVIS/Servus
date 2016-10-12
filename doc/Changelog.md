@@ -1,6 +1,13 @@
 
 # Changelog {#Changelog}
 
+# git master
+
+* [64](https://github.com/HBPVis/Servus/pull/64):
+  Add Serializable::getSchema()
+* [63](https://github.com/HBPVis/Servus/pull/63):
+  Make Serializable copy- and moveable
+
 # Release 1.4 (30-06-2016)
 
 * [53](https://github.com/HBPVis/Servus/pull/53):
