@@ -23,13 +23,8 @@
 #include <servus/api.h>
 #include <servus/types.h>
 
-#ifdef SERVUS_USE_CXX03
-#  include <boost/function/function0.hpp>
-#  include <boost/shared_ptr.hpp>
-#else
-#  include <functional> // function
-#  include <memory> // shared_ptr
-#endif
+#include <functional> // function
+#include <memory> // shared_ptr
 
 namespace servus
 {
@@ -47,11 +42,7 @@ public:
     struct Data
     {
         Data() : size ( 0 ) {}
-#ifdef SERVUS_USE_CXX03
-        boost::shared_ptr< const void > ptr; //!< ptr to the binary serialization
-#else
         std::shared_ptr< const void > ptr; //!< ptr to the binary serialization
-#endif
         size_t size; //!< The size of the binary serialization
     };
 
@@ -94,13 +85,8 @@ public:
     /** @name Change Notifications */
     //@{
     /** Callbacks for change notifications. */
-#ifdef SERVUS_USE_CXX03
-    typedef boost::function< void() > DeserializedCallback;
-    typedef boost::function< void() > SerializeCallback;
-#else
     typedef std::function< void() > DeserializedCallback;
     typedef std::function< void() > SerializeCallback;
-#endif
 
     /**
      * Register a function called after the object has been updated remotely

@@ -5,6 +5,8 @@
 
 * [64](https://github.com/HBPVis/Servus/pull/64):
   Add Serializable::getSchema()
+* [64](https://github.com/HBPVis/Servus/pull/64):
+  Remove C++03 support
 * [63](https://github.com/HBPVis/Servus/pull/63):
   Make Serializable copy- and moveable
 

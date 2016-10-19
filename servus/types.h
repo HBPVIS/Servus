@@ -47,15 +47,6 @@ typedef SSIZE_T ssize_t;
 #include <vector>
 #include <string>
 
-#ifdef SERVUS_USE_CXX03
-#  ifndef final
-#    define final
-#  endif
-#  ifndef override
-#    define override
-#  endif
-#endif
-
 namespace servus
 {
 

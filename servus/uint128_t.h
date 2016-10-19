@@ -342,32 +342,8 @@ SERVUS_API uint128_t make_UUID();
 
 }
 
-#if __cplusplus >= 201103L || _MSC_VER > 1500
-// C++11
-#  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
-#  define SERVUS_HASH_NAMESPACE_CLOSE }
-#  define SERVUS_HASH_USE_STRUCT
-#  include <functional>
-#elif defined __clang__ || defined __xlC__ || defined __GNUC__
-// C++03 with clang and xlC
-#  define SERVUS_HASH_NAMESPACE_OPEN namespace std { namespace tr1 {
-#  define SERVUS_HASH_NAMESPACE_CLOSE }}
-#  define SERVUS_HASH_USE_STRUCT
-#  include <tr1/unordered_set>
-#elif _MSC_VER < 1600
-// C++03 with MSVC
-#  define SERVUS_HASH_NAMESPACE_OPEN namespace std {
-#  define SERVUS_HASH_NAMESPACE_CLOSE }
-#  define SERVUS_HASH_USE_FUNCTORS
-#else
-// Unknown compiler, hash support is disabled.
-#  define SERVUS_HASH_NONE
-#endif
-
-#ifndef SERVUS_HASH_NONE
-SERVUS_HASH_NAMESPACE_OPEN
-#  ifdef SERVUS_HASH_USE_STRUCT
-
+namespace std
+{
 template<> struct hash< servus::uint128_t >
 {
     typedef size_t result_type;
@@ -378,20 +354,6 @@ template<> struct hash< servus::uint128_t >
         return forward( in.high( )) ^ forward( in.low( ));
     }
 };
-
-#  else // SERVUS_HASH_USE_FUNCTORS
-
-template<> inline size_t hash_compare< servus::uint128_t >::operator()
-    ( const servus::uint128_t& key ) const
-{
-    return static_cast< size_t >( key.high() ^ key.low( ));
 }
 
-template<> inline size_t hash_value( const servus::uint128_t& key )
-    { return static_cast< size_t >( key.high() ^ key.low( )); }
-#  endif
-
-SERVUS_HASH_NAMESPACE_CLOSE
-
-#endif // SERVUS_HASH
 #endif // SERVUS_UINT128_H
