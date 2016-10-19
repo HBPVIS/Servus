@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2010-2015, Stefan Eilemann <eile@equalizergraphics.com>
+/* Copyright (c) 2010-2016, Stefan Eilemann <eile@equalizergraphics.com>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -28,12 +28,10 @@
 #include <boost/functional/hash.hpp>
 #include <iostream>
 
-#ifndef SERVUS_USE_CXX03
-#  include <mutex>
-#  include <random>
-#  include <thread>
+#include <mutex>
+#include <random>
+#include <thread>
 const size_t N_THREADS = 10;
-#endif
 
 const size_t N_UUIDS = 10000;
 
@@ -121,7 +119,6 @@ BOOST_AUTO_TEST_CASE(basic)
     BOOST_CHECK_EQUAL( id6.low(), 0xE9800998ECF8427Eull );
 }
 
-#ifndef SERVUS_USE_CXX03
 class Thread
 {
 public:
@@ -189,7 +186,6 @@ BOOST_AUTO_TEST_CASE(concurrent)
         }
     }
 }
-#endif
 
 BOOST_AUTO_TEST_CASE(convert_uint128_to_uuid)
 {

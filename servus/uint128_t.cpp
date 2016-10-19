@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2011-2015, Stefan Eilemann <eile@eyescale.ch>
+/* Copyright (c) 2011-2016, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -20,20 +20,8 @@
 #include "uint128_t.h"
 #include "md5/md5.hh"
 
-#ifdef SERVUS_USE_CXX03
-#  include <boost/random.hpp>
-#  include <boost/thread/mutex.hpp>
-    namespace rnd=boost::random;
-    using boost::mutex;
-    typedef boost::unique_lock< mutex > ScopedLock;
-#else
-#  include <mutex>
-#  include <random>
-    namespace rnd=std;
-    using std::mutex;
-    typedef std::unique_lock< mutex > ScopedLock;
-    namespace chrono = std::chrono;
-#endif
+#include <mutex>
+#include <random>
 
 #include <cassert>
 #include <cstdlib> // for strtoull
@@ -42,6 +30,9 @@
 #ifdef _MSC_VER
 #  define strtoull _strtoui64
 #endif
+
+using ScopedLock = std::unique_lock< std::mutex >;
+namespace chrono = std::chrono;
 
 namespace servus
 {
@@ -95,13 +86,9 @@ uint128_t make_UUID()
     uint128_t value;
     while( value.high() == 0 )
     {
-#ifdef SERVUS_USE_CXX03
-        static rnd::mt19937_64 engine;
-#else
-        static rnd::random_device device;
-        static rnd::mt19937_64 engine( device( ));
-#endif
-        static rnd::uniform_int_distribution< uint64_t > generator(
+        static std::random_device device;
+        static std::mt19937_64 engine( device( ));
+        static std::uniform_int_distribution< uint64_t > generator(
             0, std::numeric_limits<uint64_t>::max());
         // The static state is hidden to users, so the function is made
         // thread safe for robustness over performance.
@@ -109,7 +96,7 @@ uint128_t make_UUID()
         // chances of collissions up to a noticeable level.
 #ifndef _MSC_VER
         // http://stackoverflow.com/questions/14711263/c11-stdmutex-in-visual-studio-2012-deadlock-when-locked-from-dllmain
-        static mutex mutex;
+        static std::mutex mutex;
         ScopedLock lock( mutex );
 #endif
         value.high() = generator( engine );

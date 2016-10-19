@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2012-2016, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -21,14 +21,7 @@
 
 #include <servus/servus.h>
 
-#ifdef SERVUS_USE_CXX03
-#  include <boost/random.hpp>
-#  include <boost/lexical_cast.hpp>
-    namespace rnd=boost::random;
-#else
-#  include <random>
-    namespace rnd=std;
-#endif
+#include <random>
 
 #ifdef SERVUS_USE_DNSSD
 #  include <dns_sd.h>
@@ -46,29 +39,16 @@ static const int _propagationTries = 10;
 
 uint16_t getRandomPort()
 {
-#ifdef SERVUS_USE_CXX03
-    static rnd::minstd_rand engine;
-#else
-    static rnd::random_device device;
-    static rnd::minstd_rand engine( device( ));
-#endif
-    rnd::uniform_int_distribution< uint16_t > generator( 1024u, 65535u );
+    static std::random_device device;
+    static std::minstd_rand engine( device( ));
+    std::uniform_int_distribution< uint16_t > generator( 1024u, 65535u );
     return generator( engine );
-}
-
-template< class T > std::string toString( const T& what )
-{
-#ifdef SERVUS_USE_CXX03
-    return boost::lexical_cast< std::string >( what );
-#else
-    return std::to_string( what );
-#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_servus)
 {
     const uint32_t port = getRandomPort();
-    std::string serviceName = "_servustest_" + toString( port ) + "._tcp";
+    std::string serviceName = "_servustest_" + std::to_string( port ) + "._tcp";
 
     try
     {
@@ -88,7 +68,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     servus::Servus service( serviceName );
     const servus::Servus::Result& result = service.announce( port,
-                                                             toString( port ));
+                                                        std::to_string( port ));
 
     BOOST_CHECK_EQUAL( service.getName(), serviceName );
 
@@ -114,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
     service.set( "foo", "bar" );
     BOOST_CHECK_EQUAL( service.get( "foo" ), "bar" );
     BOOST_CHECK_EQUAL( service.get( "bar" ), std::string( ));
-    BOOST_CHECK( service.announce( port, toString( port )));
+    BOOST_CHECK( service.announce( port, std::to_string( port )));
 
     int nLoops = _propagationTries;
     while( --nLoops )
@@ -133,7 +113,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
         }
 
         BOOST_REQUIRE_EQUAL( hosts.size(), 1 );
-        BOOST_CHECK_EQUAL( hosts.front(), toString( port ));
+        BOOST_CHECK_EQUAL( hosts.front(), std::to_string( port ));
         BOOST_CHECK( service.containsKey( hosts.front(), "foo" ));
         BOOST_CHECK_EQUAL( service.get( hosts.front(), "foo" ), "bar" );
         BOOST_CHECK_EQUAL( service.get( "bar", "foo" ), std::string( ));
@@ -178,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_servus)
 
     { // test updates during browsing
         servus::Servus service2( serviceName );
-        BOOST_CHECK( service2.announce( port+1, toString( port+1 )));
+        BOOST_CHECK( service2.announce( port+1, std::to_string( port+1 )));
 
 
         nLoops = _propagationTries;

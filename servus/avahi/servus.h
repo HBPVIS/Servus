@@ -1,5 +1,5 @@
-/* Copyright (c) 2014-2015, Stefan.Eilemann@epfl.ch
- *               2015, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
+ *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -27,19 +27,10 @@
 #include <stdexcept>
 
 #include <cassert>
+#include <mutex>
 
-#ifdef SERVUS_USE_CXX03
-#  include <boost/chrono.hpp>
-#  include <boost/thread/mutex.hpp>
-    using boost::mutex;
-    typedef boost::unique_lock< mutex > ScopedLock;
-    namespace chrono = boost::chrono;
-#else
-#  include <mutex>
-    using std::mutex;
-    typedef std::unique_lock< mutex > ScopedLock;
-    namespace chrono = std::chrono;
-#endif
+using ScopedLock = std::unique_lock< std::mutex >;
+namespace chrono = std::chrono;
 
 #define WARN std::cerr << __FILE__ << ":" << __LINE__ << ": "
 
@@ -47,7 +38,7 @@
 //   Proper way of doing this is using the threaded polling in avahi
 namespace
 {
-static mutex _mutex;
+static std::mutex _mutex;
 
 int64_t _elapsedMilliseconds(
     const chrono::high_resolution_clock::time_point& startTime )

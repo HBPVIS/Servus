@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE(serializable_types)
     BOOST_CHECK_EQUAL( obj.getTypeName(), "test::serializable" );
     BOOST_CHECK_EQUAL( servus::make_uint128( obj.getTypeName( )),
                        obj.getTypeIdentifier( ));
+    BOOST_CHECK_EQUAL( obj.getSchema(), std::string( ));
 }
 
 BOOST_AUTO_TEST_CASE(serializable_registerSerialize)

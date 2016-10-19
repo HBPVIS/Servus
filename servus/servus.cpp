@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2012-2015, Stefan Eilemann <eile@eyescale.ch>
+/* Copyright (c) 2012-2016, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -23,11 +23,7 @@
 
 #include <cstring>
 #include <map>
-#ifdef SERVUS_USE_CXX03
-#  include <set>
-#else
-#  include <unordered_set>
-#endif
+#include <unordered_set>
 
 // for NI_MAXHOST
 #ifdef _WIN32
@@ -48,12 +44,7 @@ typedef std::map< std::string, std::string > ValueMap;
 typedef std::map< std::string, ValueMap > InstanceMap;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
-
-#ifdef SERVUS_USE_CXX03
-typedef std::set< Listener* > Listeners;
-#else
 typedef std::unordered_set< Listener* > Listeners;
-#endif
 
 class Servus
 {

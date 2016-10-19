@@ -1,5 +1,5 @@
-# Copyright (c) 2015, Human Brain Project
-#                     Juan Hernando <jhernando@fi.upm.es>
+# Copyright (c) 2015-2016, Human Brain Project
+#                          Juan Hernando <jhernando@fi.upm.es>
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
 #
@@ -50,10 +50,6 @@ endif()
 if(AVAHI-CLIENT_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES ${avahi-client_LIBRARIES})
 endif()
-if(COMMON_USE_CXX03)
-  list(APPEND SERVUS_LINK_LIBRARIES ${Boost_SYSTEM_LIBRARY}
-    ${Boost_CHRONO_LIBRARY})
-endif()
 if(BOOST_FOUND)
   list(APPEND SERVUS_LINK_LIBRARIES PRIVATE ${Boost_REGEX_LIBRARY})
 endif()
@@ -61,6 +57,6 @@ endif()
 set(SERVUS_OMIT_LIBRARY_HEADER ON)
 common_library(Servus)
 
-if(Qt5Core_FOUND AND NOT COMMON_USE_CXX03)
+if(Qt5Core_FOUND)
   add_subdirectory(qt)
 endif()

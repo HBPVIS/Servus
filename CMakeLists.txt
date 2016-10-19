@@ -17,8 +17,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(Servus VERSION 1.4.0)
-set(Servus_VERSION_ABI 4)
+project(Servus VERSION 1.5.0)
+set(Servus_VERSION_ABI 5)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
                               ${CMAKE_SOURCE_DIR}/CMake/common)
@@ -38,13 +38,7 @@ if(LINUX)
 else()
   common_find_package(DNSSD)
 endif()
-if(COMMON_USE_CXX03)
-  set(BOOST_COMPONENTS REQUIRED COMPONENTS unit_test_framework random system
-    thread chrono regex)
-else()
-  set(BOOST_COMPONENTS COMPONENTS unit_test_framework regex)
-endif()
-common_find_package(Boost 1.51 ${BOOST_COMPONENTS})
+common_find_package(Boost 1.51 COMPONENTS unit_test_framework regex)
 common_find_package(Qt5Core)
 common_find_package(Qt5Widgets)
 common_find_package(Threads REQUIRED)
