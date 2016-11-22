@@ -354,6 +354,11 @@ template<> struct hash< servus::uint128_t >
         return forward( in.high( )) ^ forward( in.low( ));
     }
 };
+
+inline string to_string( const servus::uint128_t& value )
+{
+    return value.getString();
+}
 }
 
 #endif // SERVUS_UINT128_H

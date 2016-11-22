@@ -97,8 +97,7 @@ public:
      * @throw if a DeserializedCallback is already registered and the specified
      * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API void registerDeserializedCallback(
-            const DeserializedCallback& callback );
+    SERVUS_API void registerDeserializedCallback( const DeserializedCallback& );
 
     /**
      * Register a function to be called when the serializable object is about
@@ -109,8 +108,7 @@ public:
      * @throw if a SerializedCallback is already registered and the specified
      * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API void registerSerializeCallback(
-            const SerializeCallback& callback );
+    SERVUS_API void registerSerializeCallback( const SerializeCallback& );
     //@}
 
 protected:
