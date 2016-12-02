@@ -3,6 +3,8 @@
 
 # git master
 
+# Release 1.5 (09-12-2016)
+
 * [64](https://github.com/HBPVis/Servus/pull/64):
   Add Serializable::getSchema()
 * [64](https://github.com/HBPVis/Servus/pull/64):
