@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2015, Cedric Stalder <cedric.stalder@gmail.com>
+/* Copyright (c) 2010-2016, Cedric Stalder <cedric.stalder@gmail.com>
  *                          Stefan Eilemann <eile@eyescale.ch>
  *                          Daniel Nachbaur <danielnachbaur@gmail.com>
  *
@@ -224,21 +224,26 @@ public:
 
     /** @return a short, but not necessarily unique, string of the value. */
     std::string getShortString() const
-        {
-            std::stringstream stream;
-            stream << std::hex << _high << _low;
-            const std::string str = stream.str();
-            return str.substr( 0, 3 ) + ".." +
-                str.substr( str.length() - 3, std::string::npos );
-        }
+    {
+        std::stringstream stream;
+        stream << std::hex << _high << _low;
+        const std::string str = stream.str();
+        return str.substr( 0, 3 ) + ".." +
+               str.substr( str.length() - 3, std::string::npos );
+    }
 
     /** @return the full string representation of the value. */
     std::string getString() const
-        {
-            std::stringstream stream;
-            stream << *this;
-            return stream.str();
-        }
+    {
+        // OPT: snprintf is faster then using std::stringstream
+        char buffer[ 34 ] /* 16 bytes + : + \0 */;
+#ifdef _MSC_VER
+        snprintf( buffer, 34, "%llx:%llx", high(), low( ));
+#else
+        snprintf( buffer, 34, "%lx:%lx", high(), low( ));
+#endif
+        return std::string( buffer );
+    }
 
     /** Serialize this object to a boost archive. */
     template< class Archive >
