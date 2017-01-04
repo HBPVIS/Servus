@@ -1,4 +1,4 @@
-/* Copyright (c) 2015-2016, Human Brain Project
+/* Copyright (c) 2015-2017, Human Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -56,6 +56,7 @@ class Servus;
 class URI;
 class uint128_t;
 
+typedef unsigned long long ull_t;
 typedef std::vector< std::string > Strings;
 }
 

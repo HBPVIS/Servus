@@ -1,4 +1,4 @@
-/* Copyright (c) 2010-2016, Cedric Stalder <cedric.stalder@gmail.com>
+/* Copyright (c) 2010-2017, Cedric Stalder <cedric.stalder@gmail.com>
  *                          Stefan Eilemann <eile@eyescale.ch>
  *                          Daniel Nachbaur <danielnachbaur@gmail.com>
  *
@@ -22,6 +22,7 @@
 #define SERVUS_UINT128_H
 
 #include <servus/api.h>
+#include <servus/types.h>
 
 #include <sstream>
 #ifdef _MSC_VER
@@ -235,13 +236,9 @@ public:
     /** @return the full string representation of the value. */
     std::string getString() const
     {
-        // OPT: snprintf is faster then using std::stringstream
-        char buffer[ 34 ] /* 16 bytes + : + \0 */;
-#ifdef _MSC_VER
-        snprintf( buffer, 34, "%llx:%llx", high(), low( ));
-#else
-        snprintf( buffer, 34, "%lx:%lx", high(), low( ));
-#endif
+        // OPT: snprintf is faster than using std::stringstream
+        char buffer[ 34 ] /* 2 x 16 bytes + : + \0 */;
+        snprintf( buffer, 34, "%llx:%llx", ull_t( high( )), ull_t( low( )));
         return std::string( buffer );
     }
 
