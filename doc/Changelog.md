@@ -3,6 +3,9 @@
 
 # git master
 
+* [68](https://github.com/HBPVis/Servus/pull/68):
+  Optimize uint128_t::getString()
+
 # Release 1.5 (09-12-2016)
 
 * [64](https://github.com/HBPVis/Servus/pull/64):
