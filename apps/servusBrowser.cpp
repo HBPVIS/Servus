@@ -46,7 +46,7 @@ int main( int argc, char** argv )
     QFormLayout* layout = new QFormLayout( widget );
 
     QLineEdit* lineEdit = new QLineEdit( widget );
-    lineEdit->setText( "_hbp._tcp" );
+    lineEdit->setText( "_zeroeq_pub._tcp" );
     layout->addRow( "Service name", lineEdit );
 
     QTreeView* view = new QTreeView( widget );
