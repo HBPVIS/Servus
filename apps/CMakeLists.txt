@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2016, Human Brain Project
+# Copyright (c) 2015-2017, Human Brain Project
 #                          Daniel.Nachbaur@epfl.ch
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -24,7 +24,7 @@ set(SERVUSBROWSER_SOURCES servusBrowser.cpp)
 set(SERVUSBROWSER_LINK_LIBRARIES ServusQt Qt5::Widgets)
 
 if(APPLE)
-common_application(ServusBrowser GUI)
+common_application(ServusBrowser GUI NOHELP)
 else()
-common_application(servusBrowser GUI)
+common_application(servusBrowser GUI NOHELP)
 endif()
