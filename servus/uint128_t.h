@@ -30,6 +30,7 @@
 // using uint128_t
 #  include <basetsd.h>
 typedef UINT64     uint64_t;
+#  define snprintf _snprintf
 #else
 #  include <stdint.h>
 #endif
