@@ -330,30 +330,22 @@ private:
                             AvahiProtocol, AvahiResolverEvent event,
                             const char* name, const char*, const char*,
                             const char* host, const AvahiAddress*, uint16_t,
-                            AvahiStringList* txt, AvahiLookupResultFlags,
+                            AvahiStringList* txt, AvahiLookupResultFlags flags,
                             void* servus)
     {
-        ((Servus*)servus)->_resolveCB(resolver, event, name, host, txt);
+        ((Servus*)servus)->_resolveCB(resolver, event, name, host, txt, flags);
     }
 
     void _resolveCB(AvahiServiceResolver* resolver,
                     const AvahiResolverEvent event, const char* name,
-                    const char* host, AvahiStringList* txt)
+                    const char* host, AvahiStringList* txt,
+                    const AvahiLookupResultFlags flags)
     {
-        // If browsing through the local interface,
-        // consider only the local instances
-        if (_scope == servus::Servus::IF_LOCAL)
-        {
-            const std::string& hostStr(host);
-            // host in "hostname.local" format
-            const size_t pos = hostStr.find_last_of(".");
-            const std::string hostName = hostStr.substr(0, pos);
-
-            const std::string& localHost = getHostname();
-            // omit the domain for the local hostname
-            if (hostName != localHost.substr(0, localHost.find_first_of(".")))
-                return;
-        }
+        // If browsing through the local interface, consider only the local
+        // instances
+        if (_scope == servus::Servus::IF_LOCAL &&
+            !(flags & AVAHI_LOOKUP_RESULT_LOCAL))
+            return;
 
         switch (event)
         {
