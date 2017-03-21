@@ -23,14 +23,13 @@
 #include <servus/qt/api.h>
 #include <servus/types.h>
 
-#include <memory> // std::unique_ptr
 #include <QAbstractItemModel> // base class
+#include <memory>             // std::unique_ptr
 
 namespace servus
 {
 namespace qt
 {
-
 /**
  * An item model on top of a Servus service, to be used in a Qt item view.
  *
@@ -54,14 +53,15 @@ public:
      * @param parent optional parent for memory ownership
      * @version 1.2
      */
-    SERVUSQT_API ItemModel( Servus& service, QObject* parent = nullptr );
+    SERVUSQT_API ItemModel(Servus& service, QObject* parent = nullptr);
 
     /** Destruct the model and reset the service back to non-browsing state. */
     SERVUSQT_API virtual ~ItemModel();
 
     /** Mandatory override of QAbstractItemModel::index. */
-    SERVUSQT_API QModelIndex index( int row, int colum,
-                     const QModelIndex& parent = QModelIndex( )) const override;
+    SERVUSQT_API QModelIndex
+        index(int row, int colum,
+              const QModelIndex& parent = QModelIndex()) const override;
 
     /**
      * Mandatory override of QAbstractItemModel::parent.
@@ -70,7 +70,7 @@ public:
      * instance. If index points to an instance, the parent will be
      * QModelIndex().
      */
-    SERVUSQT_API QModelIndex parent( const QModelIndex& index ) const override;
+    SERVUSQT_API QModelIndex parent(const QModelIndex& index) const override;
 
     /**
      * Mandatory override of QAbstractItemModel::rowCount.
@@ -81,7 +81,7 @@ public:
      * key-value item, the row count will always be 0.
      */
     SERVUSQT_API
-    int rowCount( const QModelIndex& index = QModelIndex( )) const override;
+    int rowCount(const QModelIndex& index = QModelIndex()) const override;
 
     /**
      * Mandatory override of QAbstractItemModel::columnCount.
@@ -89,7 +89,7 @@ public:
      * Independent of index, the column count will always be 1.
      */
     SERVUSQT_API
-    int columnCount( const QModelIndex& index = QModelIndex( )) const override;
+    int columnCount(const QModelIndex& index = QModelIndex()) const override;
 
     /**
      * Mandatory override of QAbstractItemModel::data.
@@ -101,8 +101,8 @@ public:
      * the format "key = value". For any other index and/or role, the returned
      * data will be QVariant().
      */
-    SERVUSQT_API QVariant data( const QModelIndex& index,
-                                int role = Qt::DisplayRole ) const override;
+    SERVUSQT_API QVariant data(const QModelIndex& index,
+                               int role = Qt::DisplayRole) const override;
 
     /**
      * Optional override of QAbstractItemModel::headerData.
@@ -112,14 +112,13 @@ public:
      * "Instances for <service-name>". For any other input, the returned data
      * will be QVariant().
      */
-    SERVUSQT_API QVariant headerData( int section, Qt::Orientation orientation,
-                                      int role ) const override;
+    SERVUSQT_API QVariant headerData(int section, Qt::Orientation orientation,
+                                     int role) const override;
 
 private:
     class Impl;
-    std::unique_ptr< Impl > _impl;
+    std::unique_ptr<Impl> _impl;
 };
-
 }
 }
 

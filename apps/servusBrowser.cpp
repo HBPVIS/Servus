@@ -17,61 +17,60 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <servus/qt/itemModel.h>
 #include <servus/servus.h>
 #include <servus/version.h>
-#include <servus/qt/itemModel.h>
 
 #include <QApplication>
 #include <QFormLayout>
-#include <QMainWindow>
-#include <QWidget>
 #include <QLineEdit>
+#include <QMainWindow>
 #include <QTreeView>
+#include <QWidget>
 
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
-    QApplication app( argc, argv );
+    QApplication app(argc, argv);
     QGuiApplication::setApplicationVersion(
-                QString::fromStdString( servus::Version::getString( )));
-    app.setQuitOnLastWindowClosed( true );
-    app.setApplicationName( "Servus Browser" );
+        QString::fromStdString(servus::Version::getString()));
+    app.setQuitOnLastWindowClosed(true);
+    app.setApplicationName("Servus Browser");
 
-    std::unique_ptr< servus::Servus > service;
-    std::unique_ptr< servus::qt::ItemModel > model;
+    std::unique_ptr<servus::Servus> service;
+    std::unique_ptr<servus::qt::ItemModel> model;
 
     QMainWindow window;
-    QWidget* widget = new QWidget( &window );
-    window.setCentralWidget( widget );
+    QWidget* widget = new QWidget(&window);
+    window.setCentralWidget(widget);
 
-    QFormLayout* layout = new QFormLayout( widget );
+    QFormLayout* layout = new QFormLayout(widget);
 
-    QLineEdit* lineEdit = new QLineEdit( widget );
-    lineEdit->setText( "_zeroeq_pub._tcp" );
-    layout->addRow( "Service name", lineEdit );
+    QLineEdit* lineEdit = new QLineEdit(widget);
+    lineEdit->setText("_zeroeq_pub._tcp");
+    layout->addRow("Service name", lineEdit);
 
-    QTreeView* view = new QTreeView( widget );
-    view->setHeaderHidden( true );
-    layout->addRow( view );
-    widget->setLayout( layout );
+    QTreeView* view = new QTreeView(widget);
+    view->setHeaderHidden(true);
+    layout->addRow(view);
+    widget->setLayout(layout);
 
-    const auto onServiceChanged = [&]()
-    {
+    const auto onServiceChanged = [&]() {
         const std::string& serviceName = lineEdit->text().toStdString();
-        if( service && service->getName() == serviceName )
+        if (service && service->getName() == serviceName)
             return;
 
-        view->setModel( nullptr );
+        view->setModel(nullptr);
         model.reset();
 
-        service.reset( new servus::Servus( serviceName ));
-        model.reset( new servus::qt::ItemModel( *service ));
-        view->setModel( model.get( ));
+        service.reset(new servus::Servus(serviceName));
+        model.reset(new servus::qt::ItemModel(*service));
+        view->setModel(model.get());
     };
 
-    lineEdit->connect( lineEdit, &QLineEdit::returnPressed, onServiceChanged );
+    lineEdit->connect(lineEdit, &QLineEdit::returnPressed, onServiceChanged);
     onServiceChanged();
 
-    window.resize( 400, 300 );
+    window.resize(400, 300);
     window.show();
     return app.exec();
 }

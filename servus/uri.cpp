@@ -21,9 +21,9 @@
 #include "uri.h"
 
 #include <algorithm>
+#include <cassert>
 #include <exception>
 #include <iostream>
-#include <cassert>
 #include <sstream>
 #include <stdexcept>
 
@@ -37,17 +37,16 @@ namespace
 {
 struct URIData
 {
-    URIData() : port( 0 ) {}
-
-    bool operator == ( const URIData& rhs ) const
+    URIData()
+        : port(0)
     {
-        return (userinfo == rhs.userinfo &&
-                host == rhs.host &&
-                port == rhs.port &&
-                path == rhs.path &&
-                query == rhs.query &&
-                fragment == rhs.fragment &&
-                queryMap == rhs.queryMap);
+    }
+
+    bool operator==(const URIData& rhs) const
+    {
+        return (userinfo == rhs.userinfo && host == rhs.host &&
+                port == rhs.port && path == rhs.path && query == rhs.query &&
+                fragment == rhs.fragment && queryMap == rhs.queryMap);
     }
 
     std::string scheme;
@@ -66,186 +65,183 @@ namespace detail
 class uri_parse : public std::exception
 {
 public:
-    explicit uri_parse( const std::string& uri )
+    explicit uri_parse(const std::string& uri)
     {
-        _error = std::string( "Error parsing URI string: " ) + uri;
+        _error = std::string("Error parsing URI string: ") + uri;
     }
 
-    uri_parse( const uri_parse& excep )
-    {
-        _error = excep._error;
-    }
-
+    uri_parse(const uri_parse& excep) { _error = excep._error; }
     virtual ~uri_parse() throw() {}
-
     virtual const char* what() const throw() { return _error.c_str(); }
-
 private:
     std::string _error;
 };
 
-enum URIPart { SCHEME = 0, AUTHORITY, PATH, QUERY, FRAGMENT };
+enum URIPart
+{
+    SCHEME = 0,
+    AUTHORITY,
+    PATH,
+    QUERY,
+    FRAGMENT
+};
 
-bool _parseURIPart( std::string& input, const URIPart& part,
-                    std::string& output )
+bool _parseURIPart(std::string& input, const URIPart& part, std::string& output)
 {
 #ifndef NDEBUG
-    const char requireFirst[] = { 0, 0, 0, '?', '#' };
+    const char requireFirst[] = {0, 0, 0, '?', '#'};
 #endif
-    const char* const separators[] = { "://", "/?#", "?#", "#", "" };
-    const char* const disallowed[] = { "/?#", 0, 0, 0, 0 };
-    const bool fullSeparator[] = { true, false, false, false, false };
-    const bool needsSeparator[] = { true, false, false, false, false };
-    const size_t skip[] = { 0, 0, 0, 1, 1 };
-    const size_t postSkip[] = { 3, 0, 0, 0, 0 };
-    const size_t pos = fullSeparator[part] ? input.find( separators[part] )
-                                      : input.find_first_of( separators[part] );
+    const char* const separators[] = {"://", "/?#", "?#", "#", ""};
+    const char* const disallowed[] = {"/?#", 0, 0, 0, 0};
+    const bool fullSeparator[] = {true, false, false, false, false};
+    const bool needsSeparator[] = {true, false, false, false, false};
+    const size_t skip[] = {0, 0, 0, 1, 1};
+    const size_t postSkip[] = {3, 0, 0, 0, 0};
+    const size_t pos = fullSeparator[part]
+                           ? input.find(separators[part])
+                           : input.find_first_of(separators[part]);
 
-    if( pos == std::string::npos )
+    if (pos == std::string::npos)
     {
-        if( needsSeparator[part] )
+        if (needsSeparator[part])
         {
             output = "";
             return true;
         }
     }
-    else if ( pos == 0 ||
-              ( disallowed[part] &&
-                input.find_first_of( disallowed[part] ) < pos ))
+    else if (pos == 0 ||
+             (disallowed[part] && input.find_first_of(disallowed[part]) < pos))
     {
         output = "";
         return true;
     }
     // If the separator is not the first character, assert that parts requiring
     // an initial character find it.
-    assert( !requireFirst[part] || pos == 0 || input[0] == requireFirst[part] );
+    assert(!requireFirst[part] || pos == 0 || input[0] == requireFirst[part]);
 
     // If the separator was found at pos == 0, the returned string is empty
-    assert( input.size() >= skip[part] );
-    output = input.substr( skip[part], pos - skip[part] );
-    input = pos == std::string::npos ?
-        "" : input.substr( pos + postSkip[part] );
+    assert(input.size() >= skip[part]);
+    output = input.substr(skip[part], pos - skip[part]);
+    input = pos == std::string::npos ? "" : input.substr(pos + postSkip[part]);
     return true;
 }
 
-void _parseAuthority( URIData& data, const std::string& auth )
+void _parseAuthority(URIData& data, const std::string& auth)
 {
-    const size_t atPos = auth.find_first_of( '@' );
-    if( atPos != std::string::npos )
-        data.userinfo = auth.substr( 0, atPos );
-    const size_t hostPos =
-        atPos == std::string::npos ? 0 : atPos + 1;
-    const size_t colonPos =
-        auth.find_first_of( ':', hostPos );
-    if( colonPos != std::string::npos )
+    const size_t atPos = auth.find_first_of('@');
+    if (atPos != std::string::npos)
+        data.userinfo = auth.substr(0, atPos);
+    const size_t hostPos = atPos == std::string::npos ? 0 : atPos + 1;
+    const size_t colonPos = auth.find_first_of(':', hostPos);
+    if (colonPos != std::string::npos)
     {
-        const std::string port = auth.substr( colonPos + 1 );
+        const std::string port = auth.substr(colonPos + 1);
         char* end = 0;
-        data.port = ::strtol( port.c_str(), &end, 10 );
-        if( port.empty() || end != port.c_str() + port.length( ))
-            throw std::runtime_error( port + " is not a valid port number" );
+        data.port = ::strtol(port.c_str(), &end, 10);
+        if (port.empty() || end != port.c_str() + port.length())
+            throw std::runtime_error(port + " is not a valid port number");
     }
     // Works regardless of colonPos == npos
-    data.host = auth.substr( hostPos, colonPos - hostPos );
-    if( data.host.empty( ))
+    data.host = auth.substr(hostPos, colonPos - hostPos);
+    if (data.host.empty())
         throw std::invalid_argument("");
 }
 
 #ifdef SERVUS_USE_BOOST
-void _warnAboutLegacySeparator( const std::string& query )
+void _warnAboutLegacySeparator(const std::string& query)
 {
-    const boost::regex legacySeparator( "[^&]*,[^&]*=" );
-    if( boost::regex_search( query, legacySeparator ))
+    const boost::regex legacySeparator("[^&]*,[^&]*=");
+    if (boost::regex_search(query, legacySeparator))
         std::cerr << "servus::URI: Detected legacy ',' separator in query: \""
                   << query << "\". Use '&' separator instead." << std::endl;
 }
 #endif
 
-void _parseQueryMap( URIData& data )
+void _parseQueryMap(URIData& data)
 {
     // parse query data into key-value pairs
     std::string query = data.query;
 
 #ifdef SERVUS_USE_BOOST
     // warn if a query uses the legacy ',' separator instead of '&'
-    _warnAboutLegacySeparator( query );
+    _warnAboutLegacySeparator(query);
 #endif
 
     data.queryMap.clear();
-    while( !query.empty( ))
+    while (!query.empty())
     {
-        const size_t nextPair = query.find( '&' );
-        if( nextPair == 0 )
+        const size_t nextPair = query.find('&');
+        if (nextPair == 0)
         {
-            query = query.substr( 1 );
+            query = query.substr(1);
             continue;
         }
 
-        const std::string pair = query.substr( 0, nextPair );
-        if( nextPair == std::string::npos )
+        const std::string pair = query.substr(0, nextPair);
+        if (nextPair == std::string::npos)
             query.clear();
         else
-            query = query.substr( nextPair + 1 );
+            query = query.substr(nextPair + 1);
 
-        const size_t eq = pair.find( '=' );
-        if( eq == 0 ) // empty key
+        const size_t eq = pair.find('=');
+        if (eq == 0) // empty key
             continue;
-        if( eq == std::string::npos ) // empty value
-            data.queryMap[ pair ] = std::string();
+        if (eq == std::string::npos) // empty value
+            data.queryMap[pair] = std::string();
         else
-            data.queryMap[ pair.substr( 0, eq ) ] = pair.substr( eq + 1 );
+            data.queryMap[pair.substr(0, eq)] = pair.substr(eq + 1);
     }
 }
 
-void _toLower( std::string& str )
+void _toLower(std::string& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), ::tolower );
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
 class URI
 {
 public:
-    explicit URI( const std::string& uri )
+    explicit URI(const std::string& uri)
     {
-        if( uri.empty( ))
+        if (uri.empty())
             return;
 
         try
         {
-            _parseURI( uri );
+            _parseURI(uri);
         }
-        catch( ... )
+        catch (...)
         {
-            throw uri_parse( uri );
+            throw uri_parse(uri);
         }
     }
 
     URIData& getData() { return _uriData; }
     const URIData& getData() const { return _uriData; }
-
 private:
     URIData _uriData;
 
-    void _parseURI( std::string input )
+    void _parseURI(std::string input)
     {
         URIPart part = SCHEME;
-        while( !input.empty( ))
+        while (!input.empty())
         {
-            switch(part)
+            switch (part)
             {
             case SCHEME:
-                _parseURIPart( input, part, _uriData.scheme );
-                _toLower( _uriData.scheme );
-                if( !_uriData.scheme.empty( ) &&
-                    ( !isalpha( _uriData.scheme[0] ) ||
-                      _uriData.scheme.find_first_not_of(
-                          "abcdefghijlkmnopqrstuvwxyz0123456789+-.", 1 ) !=
-                      std::string::npos ))
+                _parseURIPart(input, part, _uriData.scheme);
+                _toLower(_uriData.scheme);
+                if (!_uriData.scheme.empty() &&
+                    (!isalpha(_uriData.scheme[0]) ||
+                     _uriData.scheme.find_first_not_of(
+                         "abcdefghijlkmnopqrstuvwxyz0123456789+-.", 1) !=
+                         std::string::npos))
                 {
                     throw std::invalid_argument("");
                 }
-                part = _uriData.scheme == "file" || _uriData.scheme.empty() ?
-                       PATH : AUTHORITY;
+                part = _uriData.scheme == "file" || _uriData.scheme.empty()
+                           ? PATH
+                           : AUTHORITY;
                 // from http://en.wikipedia.org/wiki/File_URI_scheme:
                 //  "file:///foo.txt" is okay, while "file://foo.txt"
                 // is not, although some interpreters manage to handle
@@ -254,48 +250,47 @@ private:
             case AUTHORITY:
             {
                 std::string authority;
-                _parseURIPart( input, part, authority );
-                if( !authority.empty( ))
-                    _parseAuthority( _uriData, authority );
+                _parseURIPart(input, part, authority);
+                if (!authority.empty())
+                    _parseAuthority(_uriData, authority);
                 part = PATH;
                 break;
             }
             case PATH:
-                _parseURIPart( input, part, _uriData.path );
+                _parseURIPart(input, part, _uriData.path);
                 part = QUERY;
                 break;
             case QUERY:
-                _parseURIPart( input, part, _uriData.query );
-                _parseQueryMap( _uriData );
+                _parseURIPart(input, part, _uriData.query);
+                _parseQueryMap(_uriData);
                 part = FRAGMENT;
                 break;
             case FRAGMENT:
-                _parseURIPart( input, part, _uriData.fragment );
+                _parseURIPart(input, part, _uriData.fragment);
                 break;
             }
         }
     }
 };
-
 }
 
 URI::URI()
-    : _impl( new detail::URI( std::string( )))
+    : _impl(new detail::URI(std::string()))
 {
 }
 
-URI::URI( const std::string &uri )
-   : _impl( new detail::URI( uri ) )
+URI::URI(const std::string& uri)
+    : _impl(new detail::URI(uri))
 {
 }
 
-URI::URI( const char* uri )
-    : _impl( new detail::URI( std::string( uri )))
+URI::URI(const char* uri)
+    : _impl(new detail::URI(std::string(uri)))
 {
 }
 
-URI::URI( const URI& from )
-    : _impl( new detail::URI( *from._impl ))
+URI::URI(const URI& from)
+    : _impl(new detail::URI(*from._impl))
 {
 }
 
@@ -304,29 +299,29 @@ servus::URI::~URI()
     delete _impl;
 }
 
-URI& URI::operator = ( const URI& rhs )
+URI& URI::operator=(const URI& rhs)
 {
-    if( this != &rhs )
+    if (this != &rhs)
         *_impl = *rhs._impl;
     return *this;
 }
 
-bool URI::operator == ( const URI& rhs ) const
+bool URI::operator==(const URI& rhs) const
 {
-    return this == &rhs || ( _impl->getData() == rhs._impl->getData( ));
+    return this == &rhs || (_impl->getData() == rhs._impl->getData());
 }
 
-bool URI::operator != ( const URI& rhs ) const
+bool URI::operator!=(const URI& rhs) const
 {
-    return !( *this == rhs );
+    return !(*this == rhs);
 }
 
-const std::string &URI::getScheme() const
+const std::string& URI::getScheme() const
 {
     return _impl->getData().scheme;
 }
 
-const std::string &URI::getHost() const
+const std::string& URI::getHost() const
 {
     return _impl->getData().host;
 }
@@ -334,11 +329,11 @@ const std::string &URI::getHost() const
 std::string URI::getAuthority() const
 {
     std::stringstream authority;
-    if( !_impl->getData().userinfo.empty())
+    if (!_impl->getData().userinfo.empty())
         authority << _impl->getData().userinfo << "@";
     // IPv6 IPs are not considered.
     authority << _impl->getData().host;
-    if( _impl->getData().port )
+    if (_impl->getData().port)
         authority << ":" << _impl->getData().port;
     return authority.str();
 }
@@ -348,7 +343,7 @@ uint16_t URI::getPort() const
     return _impl->getData().port;
 }
 
-const std::string &URI::getUserinfo() const
+const std::string& URI::getUserinfo() const
 {
     return _impl->getData().userinfo;
 }
@@ -363,44 +358,44 @@ const std::string& URI::getQuery() const
     return _impl->getData().query;
 }
 
-const std::string &URI::getFragment() const
+const std::string& URI::getFragment() const
 {
     return _impl->getData().fragment;
 }
 
-void URI::setScheme( const std::string& scheme )
+void URI::setScheme(const std::string& scheme)
 {
     _impl->getData().scheme = scheme;
 }
 
-void URI::setUserInfo( const std::string& userinfo )
+void URI::setUserInfo(const std::string& userinfo)
 {
     _impl->getData().userinfo = userinfo;
 }
 
-void URI::setHost( const std::string& host )
+void URI::setHost(const std::string& host)
 {
     _impl->getData().host = host;
 }
 
-void URI::setPort( const uint16_t port )
+void URI::setPort(const uint16_t port)
 {
     _impl->getData().port = port;
 }
 
-void URI::setPath( const std::string& path )
+void URI::setPath(const std::string& path)
 {
     _impl->getData().path = path;
 }
 
-void URI::setQuery( const std::string& query )
+void URI::setQuery(const std::string& query)
 {
     URIData& data = _impl->getData();
     data.query = query;
-    detail::_parseQueryMap( data );
+    detail::_parseQueryMap(data);
 }
 
-void URI::setFragment( const std::string& fragment )
+void URI::setFragment(const std::string& fragment)
 {
     _impl->getData().fragment = fragment;
 }
@@ -415,27 +410,26 @@ URI::ConstKVIter URI::queryEnd() const
     return _impl->getData().queryMap.end();
 }
 
-URI::ConstKVIter URI::findQuery( const std::string& key ) const
+URI::ConstKVIter URI::findQuery(const std::string& key) const
 {
-    return _impl->getData().queryMap.find( key );
+    return _impl->getData().queryMap.find(key);
 }
 
-void URI::addQuery( const std::string& key, const std::string& value )
+void URI::addQuery(const std::string& key, const std::string& value)
 {
     URIData& data = _impl->getData();
 
-    data.queryMap[ key ] = value;
+    data.queryMap[key] = value;
     data.fragment.clear();
 
     // Rebuild fragment string
     data.query.clear();
-    for( URI::ConstKVIter i = queryBegin(); i != queryEnd(); ++i )
+    for (URI::ConstKVIter i = queryBegin(); i != queryEnd(); ++i)
     {
-        if( data.query.empty( ))
+        if (data.query.empty())
             data.query = i->first + "=" + i->second;
         else
-            data.query += std::string( "&" ) + i->first + "=" + i->second;
+            data.query += std::string("&") + i->first + "=" + i->second;
     }
 }
-
 }
