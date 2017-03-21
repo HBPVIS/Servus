@@ -3,6 +3,8 @@
 
 # git master
 
+* [71](https://github.com/HBPVis/Servus/pull/71):
+  Proper filtering for local services based on Avahi provided flags.
 * [68](https://github.com/HBPVis/Servus/pull/68):
   Optimize uint128_t::getString()
 
