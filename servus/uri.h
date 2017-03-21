@@ -28,7 +28,10 @@
 
 namespace servus
 {
-namespace detail { class URI; }
+namespace detail
+{
+class URI;
+}
 
 /**
  * The URI class parses the given uri using the generic syntax from RFC3986 and
@@ -59,7 +62,7 @@ namespace detail { class URI; }
 class URI
 {
 public:
-    typedef std::map< std::string, std::string > KVMap;
+    typedef std::map<std::string, std::string> KVMap;
     typedef KVMap::const_iterator ConstKVIter;
 
     /** Construct an empty URI. */
@@ -70,24 +73,24 @@ public:
      * @throw std::exception for incomplete URIs, and std::invalid_argument
      *        if the port is not a number.
      */
-    SERVUS_API explicit URI( const std::string& uri );
+    SERVUS_API explicit URI(const std::string& uri);
 
     /** @overload URI::URI( const std::string& ) */
-    SERVUS_API explicit URI( const char* uri );
+    SERVUS_API explicit URI(const char* uri);
 
     /** Copy-construct an URI. */
-    SERVUS_API URI( const URI& from );
+    SERVUS_API URI(const URI& from);
 
     SERVUS_API ~URI();
 
     /** Assign the data from another URI. */
-    SERVUS_API URI& operator = ( const URI& rhs );
+    SERVUS_API URI& operator=(const URI& rhs);
 
     /** Equals operator */
-    SERVUS_API bool operator == ( const URI& rhs ) const;
+    SERVUS_API bool operator==(const URI& rhs) const;
 
     /** Not equals operator */
-    SERVUS_API bool operator != ( const URI& rhs ) const;
+    SERVUS_API bool operator!=(const URI& rhs) const;
 
     /** @name Getters for uri data */
     //@{
@@ -107,13 +110,13 @@ public:
 
     /** @name Setters for uri data. */
     //@{
-    SERVUS_API void setScheme( const std::string& scheme );
-    SERVUS_API void setUserInfo( const std::string& userinfo );
-    SERVUS_API void setHost( const std::string& host );
-    SERVUS_API void setPort( uint16_t port );
-    SERVUS_API void setPath( const std::string& path );
-    SERVUS_API void setQuery( const std::string& query );
-    SERVUS_API void setFragment( const std::string& fragment );
+    SERVUS_API void setScheme(const std::string& scheme);
+    SERVUS_API void setUserInfo(const std::string& userinfo);
+    SERVUS_API void setHost(const std::string& host);
+    SERVUS_API void setPort(uint16_t port);
+    SERVUS_API void setPath(const std::string& path);
+    SERVUS_API void setQuery(const std::string& query);
+    SERVUS_API void setFragment(const std::string& fragment);
     //@}
 
     /** @name Access to key-value data in query. */
@@ -131,35 +134,34 @@ public:
     /**
      * @return a const iterator to the given key, or queryEnd().
      */
-    SERVUS_API ConstKVIter findQuery( const std::string& key ) const;
+    SERVUS_API ConstKVIter findQuery(const std::string& key) const;
 
     /** Add a key-value pair to the query. */
-    SERVUS_API void addQuery( const std::string& key,
-                              const std::string& value );
+    SERVUS_API void addQuery(const std::string& key, const std::string& value);
     //@}
 
 private:
     detail::URI* const _impl;
 };
 
-inline std::ostream& operator << ( std::ostream& os, const URI& uri )
+inline std::ostream& operator<<(std::ostream& os, const URI& uri)
 {
-    if( !uri.getScheme().empty( ))
+    if (!uri.getScheme().empty())
         os << uri.getScheme() << "://";
     // A valid URI can't contain the user info or port number alone, so if
     // the host name is empty the other two field are simply ignored.
-    if( !uri.getHost().empty( ))
+    if (!uri.getHost().empty())
     {
-        if( !uri.getUserinfo().empty( ))
+        if (!uri.getUserinfo().empty())
             os << uri.getUserinfo() << "@";
         os << uri.getHost();
-        if( uri.getPort( ))
+        if (uri.getPort())
             os << ':' << uri.getPort();
     }
     os << uri.getPath();
-    if( !uri.getQuery().empty( ))
+    if (!uri.getQuery().empty())
         os << '?' << uri.getQuery();
-    if( !uri.getFragment().empty( ))
+    if (!uri.getFragment().empty())
         os << '#' << uri.getFragment();
     return os;
 }
@@ -167,7 +169,7 @@ inline std::ostream& operator << ( std::ostream& os, const URI& uri )
 
 namespace std
 {
-inline std::string to_string( const servus::URI& uri )
+inline std::string to_string(const servus::URI& uri)
 {
     ostringstream os;
     os << uri;

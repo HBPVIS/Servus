@@ -23,19 +23,18 @@
 
 namespace servus
 {
-
 class Serializable::Impl
 {
 public:
     void notifyDeserialized() const
     {
-        if( deserialized )
+        if (deserialized)
             deserialized();
     }
 
     void notifySerialize() const
     {
-        if( serialize )
+        if (serialize)
             serialize();
     }
 
@@ -44,52 +43,54 @@ public:
 };
 
 Serializable::Serializable()
-    : _impl( new Serializable::Impl( ))
-{}
+    : _impl(new Serializable::Impl())
+{
+}
 
 Serializable::~Serializable()
 {
     delete _impl;
 }
 
-Serializable::Serializable( const Serializable& rhs )
-    : _impl( new Serializable::Impl( *rhs._impl ))
-{}
-
-Serializable& Serializable::operator=( const Serializable& rhs )
+Serializable::Serializable(const Serializable& rhs)
+    : _impl(new Serializable::Impl(*rhs._impl))
 {
-    if( this != &rhs )
+}
+
+Serializable& Serializable::operator=(const Serializable& rhs)
+{
+    if (this != &rhs)
         *_impl = *rhs._impl;
     return *this;
 }
 
 #ifdef SERVUS_USE_CXX11
-Serializable::Serializable( Serializable&& rhs )
-    : _impl( nullptr )
+Serializable::Serializable(Serializable&& rhs)
+    : _impl(nullptr)
 {
-    std::swap( _impl, rhs._impl );
+    std::swap(_impl, rhs._impl);
 }
 
-Serializable& Serializable::operator=( Serializable&& rhs )
+Serializable& Serializable::operator=(Serializable&& rhs)
 {
-    std::swap( _impl, rhs._impl );
+    std::swap(_impl, rhs._impl);
     return *this;
 }
 #endif
 
 uint128_t Serializable::getTypeIdentifier() const
 {
-    return make_uint128( getTypeName( ));
+    return make_uint128(getTypeName());
 }
 
-bool Serializable::fromBinary( const Data& data )
+bool Serializable::fromBinary(const Data& data)
 {
-    return fromBinary( data.ptr.get(), data.size );
+    return fromBinary(data.ptr.get(), data.size);
 }
 
-bool Serializable::fromBinary( const void* data, const size_t size )
+bool Serializable::fromBinary(const void* data, const size_t size)
 {
-    if( _fromBinary( data, size ))
+    if (_fromBinary(data, size))
     {
         _impl->notifyDeserialized();
         return true;
@@ -103,9 +104,9 @@ Serializable::Data Serializable::toBinary() const
     return _toBinary();
 }
 
-bool Serializable::fromJSON( const std::string& json )
+bool Serializable::fromJSON(const std::string& json)
 {
-    if( _fromJSON( json ))
+    if (_fromJSON(json))
     {
         _impl->notifyDeserialized();
         return true;
@@ -120,24 +121,23 @@ std::string Serializable::toJSON() const
 }
 
 void Serializable::registerDeserializedCallback(
-        const DeserializedCallback& callback )
+    const DeserializedCallback& callback)
 {
-    if( _impl->deserialized && callback )
-        throw( std::runtime_error(
-                "A DeserializedCallback is already registered. "
-                "Only one is supported at the moment" ));
+    if (_impl->deserialized && callback)
+        throw(
+            std::runtime_error("A DeserializedCallback is already registered. "
+                               "Only one is supported at the moment"));
 
     _impl->deserialized = callback;
 }
 
-void Serializable::registerSerializeCallback(
-        const SerializeCallback& callback )
+void Serializable::registerSerializeCallback(const SerializeCallback& callback)
 {
-    if( _impl->serialize && callback )
-        throw( std::runtime_error( "A SerializeCallback is already registered. "
-                                   "Only one is supported at the moment" ));
+    if (_impl->serialize && callback)
+        throw(
+            std::runtime_error("A SerializeCallback is already registered. "
+                               "Only one is supported at the moment"));
 
     _impl->serialize = callback;
 }
-
 }

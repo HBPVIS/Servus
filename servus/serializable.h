@@ -24,11 +24,10 @@
 #include <servus/types.h>
 
 #include <functional> // function
-#include <memory> // shared_ptr
+#include <memory>     // shared_ptr
 
 namespace servus
 {
-
 /** Interface for serializable objects */
 class Serializable
 {
@@ -41,8 +40,11 @@ public:
     /** Pointer + size wrapper for binary serialization. */
     struct Data
     {
-        Data() : size ( 0 ) {}
-        std::shared_ptr< const void > ptr; //!< ptr to the binary serialization
+        Data()
+            : size(0)
+        {
+        }
+        std::shared_ptr<const void> ptr; //!< ptr to the binary serialization
         size_t size; //!< The size of the binary serialization
     };
 
@@ -54,13 +56,12 @@ public:
 
     /** @return the description of the objects' data layout. */
     virtual std::string getSchema() const { return std::string(); }
-
     /**
      * Update this serializable from its binary representation.
      * @return true on success, false on error.
      */
-    SERVUS_API bool fromBinary( const Data& data );
-    SERVUS_API bool fromBinary( const void* data, const size_t size );
+    SERVUS_API bool fromBinary(const Data& data);
+    SERVUS_API bool fromBinary(const void* data, const size_t size);
 
     /**
      * Get a binary representation of this object.
@@ -76,7 +77,7 @@ public:
      * Update this serializable from its JSON representation.
      * @return true on success, false on error.
      */
-    SERVUS_API bool fromJSON( const std::string& json );
+    SERVUS_API bool fromJSON(const std::string& json);
 
     /** @return the JSON representation of this serializable. */
     SERVUS_API std::string toJSON() const;
@@ -85,8 +86,8 @@ public:
     /** @name Change Notifications */
     //@{
     /** Callbacks for change notifications. */
-    typedef std::function< void() > DeserializedCallback;
-    typedef std::function< void() > SerializeCallback;
+    typedef std::function<void()> DeserializedCallback;
+    typedef std::function<void()> SerializeCallback;
 
     /**
      * Register a function called after the object has been updated remotely
@@ -97,7 +98,7 @@ public:
      * @throw if a DeserializedCallback is already registered and the specified
      * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API void registerDeserializedCallback( const DeserializedCallback& );
+    SERVUS_API void registerDeserializedCallback(const DeserializedCallback&);
 
     /**
      * Register a function to be called when the serializable object is about
@@ -108,15 +109,15 @@ public:
      * @throw if a SerializedCallback is already registered and the specified
      * callback is not 'nullptr' (or 0)
      */
-    SERVUS_API void registerSerializeCallback( const SerializeCallback& );
+    SERVUS_API void registerSerializeCallback(const SerializeCallback&);
     //@}
 
 protected:
-    SERVUS_API Serializable( const Serializable& );
-    SERVUS_API Serializable& operator=( const Serializable& );
+    SERVUS_API Serializable(const Serializable&);
+    SERVUS_API Serializable& operator=(const Serializable&);
 #ifdef SERVUS_USE_CXX11
-    SERVUS_API Serializable( Serializable&& );
-    SERVUS_API Serializable& operator=( Serializable&& );
+    SERVUS_API Serializable(Serializable&&);
+    SERVUS_API Serializable& operator=(Serializable&&);
 #endif
 
 private:
@@ -127,21 +128,28 @@ private:
      * subclass implementation, if needed.
      */
     //@{
-    virtual bool _fromBinary( const void* /*data*/, const size_t /*size*/ )
-        { throw std::runtime_error( "Binary deserialization not implemented" );}
+    virtual bool _fromBinary(const void* /*data*/, const size_t /*size*/)
+    {
+        throw std::runtime_error("Binary deserialization not implemented");
+    }
     virtual Data _toBinary() const
-        { throw std::runtime_error( "Binary serialization not implemented" ); }
+    {
+        throw std::runtime_error("Binary serialization not implemented");
+    }
 
-    virtual bool _fromJSON( const std::string& /*json*/ )
-        { throw std::runtime_error( "JSON deserialization not implemented" ); }
+    virtual bool _fromJSON(const std::string& /*json*/)
+    {
+        throw std::runtime_error("JSON deserialization not implemented");
+    }
     virtual std::string _toJSON() const
-        { throw std::runtime_error( "JSON serialization not implemented" ); }
+    {
+        throw std::runtime_error("JSON serialization not implemented");
+    }
     //@}
 
     class Impl;
     Impl* _impl;
 };
-
 }
 
 #endif // SERVUS_SERIALIZABLE_H

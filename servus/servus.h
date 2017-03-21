@@ -28,7 +28,10 @@
 
 namespace servus
 {
-namespace detail { class Servus; }
+namespace detail
+{
+class Servus;
+}
 
 /**
  * Simple wrapper for ZeroConf key/value pairs.
@@ -59,8 +62,11 @@ public:
     class Result : public servus::Result
     {
     public:
-        explicit Result( const int32_t code ) : servus::Result( code ){}
-        virtual ~Result(){}
+        explicit Result(const int32_t code)
+            : servus::Result(code)
+        {
+        }
+        virtual ~Result() {}
         SERVUS_API std::string getString() const override;
 
         /** operation did not complete. */
@@ -80,7 +86,7 @@ public:
      * @param name the service descriptor, e.g., "_hwsd._tcp"
      * @version 1.1
      */
-    SERVUS_API explicit Servus( const std::string& name );
+    SERVUS_API explicit Servus(const std::string& name);
 
     /** Destruct this service. @version 1.1 */
     SERVUS_API virtual ~Servus();
@@ -100,13 +106,13 @@ public:
      *
      * @version 1.1
      */
-    SERVUS_API void set( const std::string& key, const std::string& value );
+    SERVUS_API void set(const std::string& key, const std::string& value);
 
     /** @return all (to be) announced keys. @version 1.1 */
     SERVUS_API Strings getKeys() const;
 
     /** @return the value to the given (to be) announced key. @version 1.1 */
-    SERVUS_API const std::string& get( const std::string& key ) const;
+    SERVUS_API const std::string& get(const std::string& key) const;
 
     /**
      * Start announcing the registered key/value pairs.
@@ -116,8 +122,8 @@ public:
      * @return the success status of the operation.
      * @version 1.1
      */
-    SERVUS_API Result announce( const unsigned short port,
-                                const std::string& instance );
+    SERVUS_API Result announce(const unsigned short port,
+                               const std::string& instance);
 
     /** Stop announcing the registered key/value pairs. @version 1.1 */
     SERVUS_API void withdraw();
@@ -135,8 +141,8 @@ public:
      * @sa beginBrowsing(), browse(), endBrowsing()
      * @version 1.1
      */
-    SERVUS_API Strings discover( const Interface addr,
-                                 const unsigned browseTime );
+    SERVUS_API Strings discover(const Interface addr,
+                                const unsigned browseTime);
 
     /**
      * Begin the discovery of announced key/value pairs.
@@ -145,7 +151,7 @@ public:
      * @return the success status of the operation.
      * @version 1.1
      */
-    SERVUS_API Result beginBrowsing( const servus::Servus::Interface addr );
+    SERVUS_API Result beginBrowsing(const servus::Servus::Interface addr);
 
     /**
      * Browse and process discovered key/value pairs.
@@ -154,7 +160,7 @@ public:
      * @return the success status of the operation.
      * @version 1.1
      */
-    SERVUS_API Result browse( int32_t timeout = -1 );
+    SERVUS_API Result browse(int32_t timeout = -1);
 
     /** Stop a discovery process and return all results. @version 1.1 */
     SERVUS_API void endBrowsing();
@@ -166,18 +172,18 @@ public:
     SERVUS_API Strings getInstances() const;
 
     /** @return all keys discovered on the given instance. @version 1.1 */
-    SERVUS_API Strings getKeys( const std::string& instance ) const;
+    SERVUS_API Strings getKeys(const std::string& instance) const;
 
     /** @return the host corresponding to the given instance. @version 1.3 */
-    SERVUS_API const std::string& getHost( const std::string& instance ) const;
+    SERVUS_API const std::string& getHost(const std::string& instance) const;
 
     /** @return true if the given key was discovered. @version 1.1 */
-    SERVUS_API bool containsKey( const std::string& instance,
-                                 const std::string& key ) const;
+    SERVUS_API bool containsKey(const std::string& instance,
+                                const std::string& key) const;
 
     /** @return the value of the given key and instance. @version 1.1 */
-    SERVUS_API const std::string& get( const std::string& instance,
-                                       const std::string& key ) const;
+    SERVUS_API const std::string& get(const std::string& instance,
+                                      const std::string& key) const;
 
     /**
      * Add a listener which is invoked according to its supported callbacks.
@@ -185,7 +191,7 @@ public:
      * @param listener the listener to be added, must not be nullptr
      * @version 1.2
      */
-    SERVUS_API void addListener( Listener* listener );
+    SERVUS_API void addListener(Listener* listener);
 
     /**
      * Remove a listener to stop invokation on its supported callbacks.
@@ -193,30 +199,29 @@ public:
      * @param listener the listener to be removed, must not be nullptr
      * @version 1.2
      */
-    SERVUS_API void removeListener( Listener* listener );
+    SERVUS_API void removeListener(Listener* listener);
 
     /** @internal */
-    typedef std::map< std::string, std::map< std::string, std::string > > Data;
+    typedef std::map<std::string, std::map<std::string, std::string> > Data;
 
     /** @internal */
-    SERVUS_API void getData( Data& data );
+    SERVUS_API void getData(Data& data);
 
 private:
-    Servus( const Servus& );
-    Servus& operator=( const Servus& );
+    Servus(const Servus&);
+    Servus& operator=(const Servus&);
     detail::Servus* const _impl;
-    friend SERVUS_API std::ostream& operator << ( std::ostream&,
-                                                  const Servus& );
+    friend SERVUS_API std::ostream& operator<<(std::ostream&, const Servus&);
 };
 
 /** @return the local hostname. */
 SERVUS_API std::string getHostname();
 
 /** Output the servus instance in human-readable format. */
-SERVUS_API std::ostream& operator << ( std::ostream&, const Servus& );
+SERVUS_API std::ostream& operator<<(std::ostream&, const Servus&);
 
 /** Output the servus interface in human-readable format. */
-SERVUS_API std::ostream& operator << ( std::ostream&,const Servus::Interface& );
+SERVUS_API std::ostream& operator<<(std::ostream&, const Servus::Interface&);
 }
 
 #endif // SERVUS_SERVUS_H

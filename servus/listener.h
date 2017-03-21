@@ -22,7 +22,6 @@
 
 namespace servus
 {
-
 /**
  * A listener interface which can be implemented to listen on changes of a
  * Servus instance.
@@ -33,14 +32,13 @@ class Listener
 {
 public:
     virtual ~Listener() {}
-
     /**
      * Called after a new instance was added after being discovered.
      *
      * @param instance the name of the new instance
      * @version 1.2
      */
-    virtual void instanceAdded( const std::string& instance ) = 0;
+    virtual void instanceAdded(const std::string& instance) = 0;
 
     /**
      * Called after an instance was removed from the list of discovered
@@ -49,9 +47,8 @@ public:
      * @param instance the name of the instance that was removed.
      * @version 1.2
      */
-    virtual void instanceRemoved( const std::string& instance ) = 0;
+    virtual void instanceRemoved(const std::string& instance) = 0;
 };
-
 }
 
 #endif // SERVUS_LISTENER_H

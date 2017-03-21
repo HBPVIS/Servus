@@ -23,37 +23,33 @@ namespace none
 class Servus : public detail::Servus
 {
 public:
-    explicit Servus( const std::string& name ) : detail::Servus( name ) {}
-    virtual ~Servus() {}
-
-    std::string getClassName() const { return "none"; }
-
-    servus::Servus::Result announce( const unsigned short,
-                                       const std::string& ) final
+    explicit Servus(const std::string& name)
+        : detail::Servus(name)
     {
-        return servus::Servus::Result(
-            servus::Servus::Result::NOT_SUPPORTED );
+    }
+    virtual ~Servus() {}
+    std::string getClassName() const { return "none"; }
+    servus::Servus::Result announce(const unsigned short,
+                                    const std::string&) final
+    {
+        return servus::Servus::Result(servus::Servus::Result::NOT_SUPPORTED);
     }
 
     void withdraw() final {}
     bool isAnnounced() const final { return false; }
-
-    servus::Servus::Result beginBrowsing(
-        const servus::Servus::Interface ) final
+    servus::Servus::Result beginBrowsing(const servus::Servus::Interface) final
     {
-        return servus::Servus::Result(
-            servus::Servus::Result::NOT_SUPPORTED );
+        return servus::Servus::Result(servus::Servus::Result::NOT_SUPPORTED);
     }
 
-    servus::Servus::Result browse( const int32_t ) final
+    servus::Servus::Result browse(const int32_t) final
     {
-        return servus::Servus::Result(
-            servus::Servus::Result::NOT_SUPPORTED );
+        return servus::Servus::Result(servus::Servus::Result::NOT_SUPPORTED);
     }
 
     void endBrowsing() final {}
     bool isBrowsing() const final { return false; }
-    Strings discover( const servus::Servus::Interface, const unsigned ) final
+    Strings discover(const servus::Servus::Interface, const unsigned) final
     {
         return getInstances();
     }

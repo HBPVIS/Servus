@@ -26,13 +26,12 @@
 #include <QApplication>
 
 #include <servus/listener.h>
+#include <servus/qt/itemModel.h>
 #include <servus/servus.h>
 #include <servus/uint128_t.h>
-#include <servus/qt/itemModel.h>
 
 const std::string TEST_INSTANCE = "testInstance";
 const size_t DISCOVER_TIMEOUT = 15 /*seconds*/;
-
 
 struct GlobalQtApp
 {
@@ -40,11 +39,11 @@ struct GlobalQtApp
         : app()
     {
         boost::unit_test::master_test_suite_t& testSuite =
-                boost::unit_test::framework::master_test_suite();
-        app.reset( new QCoreApplication( testSuite.argc, testSuite.argv ));
+            boost::unit_test::framework::master_test_suite();
+        app.reset(new QCoreApplication(testSuite.argc, testSuite.argv));
     }
 
-    std::unique_ptr< QCoreApplication > app;
+    std::unique_ptr<QCoreApplication> app;
 };
 
 class Watchdog
@@ -52,24 +51,25 @@ class Watchdog
 public:
     Watchdog()
 #ifdef __APPLE__
-        : gotUpdate( false )
+        : gotUpdate(false)
 #else
-        : gotUpdate( ATOMIC_VAR_INIT( false ))
+        : gotUpdate(ATOMIC_VAR_INIT(false))
 #endif
-    {}
+    {
+    }
 
     void wait()
     {
         QCoreApplication* app = QCoreApplication::instance();
         const auto startTime = std::chrono::high_resolution_clock::now();
-        while( !gotUpdate )
+        while (!gotUpdate)
         {
-            app->processEvents( QEventLoop::AllEvents, 100 /*ms*/ );
+            app->processEvents(QEventLoop::AllEvents, 100 /*ms*/);
             const auto duration =
-                    std::chrono::high_resolution_clock::now() - startTime;
+                std::chrono::high_resolution_clock::now() - startTime;
             const size_t elapsed =
-                    std::chrono::nanoseconds( duration ).count() / 1000000000;
-            if( elapsed > DISCOVER_TIMEOUT )
+                std::chrono::nanoseconds(duration).count() / 1000000000;
+            if (elapsed > DISCOVER_TIMEOUT)
                 return;
         }
     }
@@ -82,15 +82,16 @@ class WatchAdd : public Watchdog, public servus::Listener
 public:
     WatchAdd()
         : Watchdog()
-    {}
-
-    void instanceAdded( const std::string& instance ) final
     {
-        BOOST_CHECK_EQUAL( instance, TEST_INSTANCE );
+    }
+
+    void instanceAdded(const std::string& instance) final
+    {
+        BOOST_CHECK_EQUAL(instance, TEST_INSTANCE);
         gotUpdate = true;
     }
 
-    void instanceRemoved( const std::string& ) final {}
+    void instanceRemoved(const std::string&) final {}
 };
 
 class WatchRemove : public Watchdog, public servus::Listener
@@ -98,107 +99,108 @@ class WatchRemove : public Watchdog, public servus::Listener
 public:
     WatchRemove()
         : Watchdog()
-    {}
-
-    void instanceAdded( const std::string& ) final {}
-
-    void instanceRemoved( const std::string& instance ) final
     {
-        BOOST_CHECK_EQUAL( instance, TEST_INSTANCE );
+    }
+
+    void instanceAdded(const std::string&) final {}
+    void instanceRemoved(const std::string& instance) final
+    {
+        BOOST_CHECK_EQUAL(instance, TEST_INSTANCE);
         gotUpdate = true;
     }
 };
 
-BOOST_GLOBAL_FIXTURE( GlobalQtApp );
+BOOST_GLOBAL_FIXTURE(GlobalQtApp);
 
-BOOST_AUTO_TEST_CASE( invalidAccess )
+BOOST_AUTO_TEST_CASE(invalidAccess)
 {
     const std::string serviceName =
-            "_servustest_" + servus::make_UUID().getString() + "._tcp";
+        "_servustest_" + servus::make_UUID().getString() + "._tcp";
 
-    servus::Servus service( serviceName );
-    const servus::qt::ItemModel model( service );
+    servus::Servus service(serviceName);
+    const servus::qt::ItemModel model(service);
 
-    const QVariant invalidHeader = model.headerData( 0, Qt::Vertical,
-                                                     Qt::DisplayRole );
-    BOOST_CHECK( invalidHeader == QVariant( ));
+    const QVariant invalidHeader =
+        model.headerData(0, Qt::Vertical, Qt::DisplayRole);
+    BOOST_CHECK(invalidHeader == QVariant());
 
-    const QModelIndex invalidIndex = model.index( 1, 1 );
-    BOOST_CHECK( invalidIndex == QModelIndex( ));
-    BOOST_CHECK( QModelIndex() == model.parent( invalidIndex ));
+    const QModelIndex invalidIndex = model.index(1, 1);
+    BOOST_CHECK(invalidIndex == QModelIndex());
+    BOOST_CHECK(QModelIndex() == model.parent(invalidIndex));
 }
 
-BOOST_AUTO_TEST_CASE( servusItemModel )
+BOOST_AUTO_TEST_CASE(servusItemModel)
 {
     const std::string serviceName =
-            "_servustest_" + servus::make_UUID().getString() + "._tcp";
+        "_servustest_" + servus::make_UUID().getString() + "._tcp";
 
-    servus::Servus service( serviceName );
-    const servus::qt::ItemModel model( service );
+    servus::Servus service(serviceName);
+    const servus::qt::ItemModel model(service);
 
     WatchAdd watchAdd;
-    service.addListener( &watchAdd );
+    service.addListener(&watchAdd);
 
-    BOOST_CHECK_EQUAL( model.rowCount(), 0 );
-    BOOST_CHECK_EQUAL( model.columnCount(), 1 );
-    const std::string header = model.headerData( 0, Qt::Horizontal,
-                                     Qt::DisplayRole ).toString().toStdString();
-    BOOST_CHECK_EQUAL( header, "Instances for " + serviceName );
-    BOOST_CHECK( model.data( QModelIndex( )) == QVariant( ));
+    BOOST_CHECK_EQUAL(model.rowCount(), 0);
+    BOOST_CHECK_EQUAL(model.columnCount(), 1);
+    const std::string header =
+        model.headerData(0, Qt::Horizontal, Qt::DisplayRole)
+            .toString()
+            .toStdString();
+    BOOST_CHECK_EQUAL(header, "Instances for " + serviceName);
+    BOOST_CHECK(model.data(QModelIndex()) == QVariant());
 
-    servus::Servus service2( serviceName );
-    const servus::Servus::Result& result = service2.announce( 0,
-                                                              TEST_INSTANCE );
-    if( result != servus::Result::SUCCESS ) // happens on CI VMs
+    servus::Servus service2(serviceName);
+    const servus::Servus::Result& result = service2.announce(0, TEST_INSTANCE);
+    if (result != servus::Result::SUCCESS) // happens on CI VMs
     {
         std::cerr << "Bailing, got " << result
                   << ": looks like a broken zeroconf setup" << std::endl;
         return;
     }
 
-    service2.set( "foo", "bar" );
+    service2.set("foo", "bar");
 
     watchAdd.wait();
-    service.removeListener( &watchAdd );
-    if( !watchAdd.gotUpdate && getenv( "TRAVIS" ))
+    service.removeListener(&watchAdd);
+    if (!watchAdd.gotUpdate && getenv("TRAVIS"))
     {
         std::cerr << "Bailing, got no hosts on a Travis CI setup" << std::endl;
         return;
     }
 
-    BOOST_CHECK_EQUAL( model.rowCount(), 1 );
-    BOOST_CHECK_EQUAL( model.columnCount(), 1 );
-    const QModelIndex instanceIndex = model.index( 0, 0 );
-    BOOST_CHECK( model.parent( instanceIndex ) == QModelIndex( ));
-    BOOST_CHECK_EQUAL( model.data( instanceIndex ).toString().toStdString(),
-                       TEST_INSTANCE );
+    BOOST_CHECK_EQUAL(model.rowCount(), 1);
+    BOOST_CHECK_EQUAL(model.columnCount(), 1);
+    const QModelIndex instanceIndex = model.index(0, 0);
+    BOOST_CHECK(model.parent(instanceIndex) == QModelIndex());
+    BOOST_CHECK_EQUAL(model.data(instanceIndex).toString().toStdString(),
+                      TEST_INSTANCE);
     BOOST_CHECK_EQUAL(
-             model.data( instanceIndex, Qt::UserRole ).toString().toStdString(),
-             service.get( TEST_INSTANCE, "servus_host") );
-    BOOST_CHECK( model.data( instanceIndex, Qt::EditRole ) == QVariant( ));
-    BOOST_REQUIRE_EQUAL( model.rowCount( instanceIndex ), 2 );
-    const QModelIndex kv1Index = model.index( 0, 0, instanceIndex );
-    BOOST_CHECK( model.parent( kv1Index ) == instanceIndex );
-    BOOST_CHECK( model.data( kv1Index, Qt::UserRole ) == QVariant( ));
-    const QVariant kv1 = model.data( kv1Index );
-    const QVariant kv2 = model.data( model.index( 1, 0, instanceIndex ));
-    BOOST_REQUIRE_EQUAL( model.rowCount( kv1Index ), 0 );
-    BOOST_CHECK_EQUAL( kv1.toString().toStdString(),  "foo = bar" );
-    BOOST_CHECK( kv2.toString().startsWith( "servus_host = " ));
+        model.data(instanceIndex, Qt::UserRole).toString().toStdString(),
+        service.get(TEST_INSTANCE, "servus_host"));
+    BOOST_CHECK(model.data(instanceIndex, Qt::EditRole) == QVariant());
+    BOOST_REQUIRE_EQUAL(model.rowCount(instanceIndex), 2);
+    const QModelIndex kv1Index = model.index(0, 0, instanceIndex);
+    BOOST_CHECK(model.parent(kv1Index) == instanceIndex);
+    BOOST_CHECK(model.data(kv1Index, Qt::UserRole) == QVariant());
+    const QVariant kv1 = model.data(kv1Index);
+    const QVariant kv2 = model.data(model.index(1, 0, instanceIndex));
+    BOOST_REQUIRE_EQUAL(model.rowCount(kv1Index), 0);
+    BOOST_CHECK_EQUAL(kv1.toString().toStdString(), "foo = bar");
+    BOOST_CHECK(kv2.toString().startsWith("servus_host = "));
 
     WatchRemove watchRemove;
-    service.addListener( &watchRemove );
+    service.addListener(&watchRemove);
 
     service2.withdraw();
 
     watchRemove.wait();
-    service.removeListener( &watchRemove );
-    if( !watchRemove.gotUpdate && getenv( "TRAVIS" ))
+    service.removeListener(&watchRemove);
+    if (!watchRemove.gotUpdate && getenv("TRAVIS"))
     {
         std::cerr << "Bailing, no functioning discovery on a Travis CI setup"
                   << std::endl;
         return;
     }
 
-    BOOST_CHECK_EQUAL( model.rowCount(), 0 );
+    BOOST_CHECK_EQUAL(model.rowCount(), 0);
 }
