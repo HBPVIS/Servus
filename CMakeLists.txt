@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(Servus VERSION 1.5.0)
+project(Servus VERSION 1.5.1)
 set(Servus_VERSION_ABI 5)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
@@ -27,9 +27,8 @@ include(GitExternal)
 set(SERVUS_DESCRIPTION
   "C++ network oriented utilities including a zeroconf implementation")
 set(SERVUS_MAINTAINER "Human Brain Project <HBPVis@googlegroups.com>")
-set(CPACK_PACKAGE_LICENSE LGPL)
-set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
-set(SERVUS_DEB_DEPENDS libboost-test-dev avahi-daemon libavahi-client-dev)
+set(SERVUS_LICENSE LGPL)
+set(SERVUS_DEB_DEPENDS avahi-daemon libavahi-client-dev libboost-test-dev)
 
 include(Common)
 
@@ -38,7 +37,7 @@ if(LINUX)
 else()
   common_find_package(DNSSD)
 endif()
-common_find_package(Boost 1.51 COMPONENTS unit_test_framework regex)
+common_find_package(Boost 1.51 COMPONENTS unit_test_framework)
 common_find_package(Qt5Core)
 common_find_package(Qt5Widgets)
 common_find_package(Threads REQUIRED)
@@ -53,6 +52,7 @@ add_subdirectory(apps)
 add_subdirectory(tests)
 
 include(CPackConfig)
+set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
 set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
 set(DOXYGEN_MAINPAGE_MD README.md)
 include(DoxygenRule) # must be after all targets

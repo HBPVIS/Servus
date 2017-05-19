@@ -1,8 +1,10 @@
 
 # Changelog {#Changelog}
 
-# git master
+# Release 1.5.1 (git master)
 
+* [72](https://github.com/HBPVis/Servus/pull/72):
+  Removed legacy warning about ',' separator in URIs.
 * [71](https://github.com/HBPVis/Servus/pull/71):
   Proper filtering for local services based on Avahi provided flags.
 * [68](https://github.com/HBPVis/Servus/pull/68):
