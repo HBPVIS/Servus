@@ -89,6 +89,9 @@ BOOST_AUTO_TEST_CASE(test_servus)
         return;
     }
     BOOST_CHECK_EQUAL(result, result);
+    BOOST_CHECK_EQUAL(result.getString(), "success");
+    BOOST_CHECK_EQUAL(result.getCode(), 0);
+    std::cout << result << std::endl; // for coverage
 
     service.withdraw();
     service.set("foo", "bar");

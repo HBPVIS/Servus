@@ -115,10 +115,8 @@ public:
 protected:
     SERVUS_API Serializable(const Serializable&);
     SERVUS_API Serializable& operator=(const Serializable&);
-#ifdef SERVUS_USE_CXX11
     SERVUS_API Serializable(Serializable&&);
     SERVUS_API Serializable& operator=(Serializable&&);
-#endif
 
 private:
     /**

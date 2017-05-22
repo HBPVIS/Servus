@@ -64,7 +64,6 @@ Serializable& Serializable::operator=(const Serializable& rhs)
     return *this;
 }
 
-#ifdef SERVUS_USE_CXX11
 Serializable::Serializable(Serializable&& rhs)
     : _impl(nullptr)
 {
@@ -76,7 +75,6 @@ Serializable& Serializable::operator=(Serializable&& rhs)
     std::swap(_impl, rhs._impl);
     return *this;
 }
-#endif
 
 uint128_t Serializable::getTypeIdentifier() const
 {
