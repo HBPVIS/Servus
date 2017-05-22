@@ -1,5 +1,6 @@
-# Copyright (c) 2015-2016, Human Brain Project
+# Copyright (c) 2015-2017, Human Brain Project
 #                          Juan Hernando <jhernando@fi.upm.es>
+#                          Raphael Dumusc <raphael.dumusc@epfl.ch>
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
 #
@@ -20,9 +21,10 @@ cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
 project(Servus VERSION 1.5.1)
 set(Servus_VERSION_ABI 5)
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
-                              ${CMAKE_SOURCE_DIR}/CMake/common)
-include(GitExternal)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/common)
+if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
+  message(FATAL_ERROR "CMake/common missing, run: git submodule update --init")
+endif()
 
 set(SERVUS_DESCRIPTION
   "C++ network oriented utilities including a zeroconf implementation")
@@ -51,7 +53,10 @@ add_subdirectory(servus)
 add_subdirectory(apps)
 add_subdirectory(tests)
 
-include(CPackConfig)
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libavahi-client3, avahi-daemon")
+include(CommonCPack)
+
 set(COMMON_PROJECT_DOMAIN eu.humanbrainproject)
 set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
 set(DOXYGEN_MAINPAGE_MD README.md)
