@@ -49,6 +49,8 @@ if(Qt5Core_FOUND)
   set(SERVUS_DEPENDENT_LIBRARIES Qt5Core)
 endif()
 
+set(LCOV_EXCLUDE "servus/md5/*")
+
 add_subdirectory(servus)
 add_subdirectory(apps)
 add_subdirectory(tests)

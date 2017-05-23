@@ -118,6 +118,18 @@ BOOST_AUTO_TEST_CASE(basic)
     id6 = std::string("0xD41D8CD98F00B204:0xE9800998ECF8427E");
     BOOST_CHECK_EQUAL(id6.high(), 0xD41D8CD98F00B204ull);
     BOOST_CHECK_EQUAL(id6.low(), 0xE9800998ECF8427Eull);
+
+    id6 = std::string();
+    BOOST_CHECK_EQUAL(id6.high(), 0);
+    BOOST_CHECK_EQUAL(id6.low(), 0);
+
+    std::cout << id6 << std::endl; // for coverage
+
+    id6 = std::string("0xD41D8CD98F00B204\\0580xE9800998ECF8427E");
+    BOOST_CHECK_EQUAL(id6.high(), 0xD41D8CD98F00B204ull);
+    BOOST_CHECK_EQUAL(id6.low(), 0xE9800998ECF8427Eull);
+
+    std::cout << id6 << std::endl; // for coverage
 }
 
 class Thread

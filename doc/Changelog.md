@@ -1,7 +1,7 @@
 
 # Changelog {#Changelog}
 
-# Release 1.5.1 (git master)
+# Release 1.5.1 (22-05-2017)
 
 * [72](https://github.com/HBPVis/Servus/pull/72):
   Removed legacy warning about ',' separator in URIs.

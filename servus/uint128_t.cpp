@@ -95,7 +95,7 @@ uint128_t make_UUID()
         // Also, creating a new generator each call seems to increases the
         // chances of collissions up to a noticeable level.
 
-        // http://stackoverflow.com/questions/14711263/c11-stdmutex-in-visual-studio-2012-deadlock-when-locked-from-dllmain
+        // http://stackoverflow.com/questions/14711263
         static std::mutex mutex;
         ScopedLock lock(mutex);
 #endif
