@@ -1,5 +1,5 @@
-/* Copyright (c) 2016, Human Brain Project
- *                     Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2016-2017, Human Brain Project
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -21,6 +21,8 @@
 
 #include "uint128_t.h"
 
+#include <cstring>
+
 namespace servus
 {
 class Serializable::Impl
@@ -41,6 +43,16 @@ public:
     Serializable::DeserializedCallback deserialized;
     Serializable::SerializeCallback serialize;
 };
+
+Serializable::Data Serializable::Data::clone()
+{
+    Serializable::Data data;
+    data.ptr = {new uint8_t[size], std::default_delete<uint8_t[]>()};
+    data.size = size;
+
+    ::memcpy((void*)data.ptr.get(), ptr.get(), size);
+    return data;
+}
 
 Serializable::Serializable()
     : _impl(new Serializable::Impl())

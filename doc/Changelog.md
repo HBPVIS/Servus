@@ -1,6 +1,11 @@
 
 # Changelog {#Changelog}
 
+# git master
+
+* [76](https://github.com/HBPVis/Servus/pull/76):
+  Add Serializable::Data::clone() 
+
 # Release 1.5.1 (22-05-2017)
 
 * [72](https://github.com/HBPVis/Servus/pull/72):
