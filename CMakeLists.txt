@@ -18,8 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(Servus VERSION 1.5.1)
-set(Servus_VERSION_ABI 5)
+project(Servus VERSION 1.6.0)
+set(Servus_VERSION_ABI 6)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMake/common)
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)

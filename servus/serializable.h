@@ -1,5 +1,5 @@
-/* Copyright (c) 2016, Human Brain Project
- *                     Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2016-2017, Human Brain Project
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -44,6 +44,10 @@ public:
             : size(0)
         {
         }
+
+        /** @return a deep copy of Data. */
+        SERVUS_API Data clone();
+
         std::shared_ptr<const void> ptr; //!< ptr to the binary serialization
         size_t size; //!< The size of the binary serialization
     };
