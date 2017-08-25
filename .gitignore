@@ -2,3 +2,4 @@ Makefile
 CMakeLists.txt.user*
 build/
 ___*
+.tags

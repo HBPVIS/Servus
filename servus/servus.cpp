@@ -37,23 +37,24 @@ namespace servus
 {
 #define ANNOUNCE_TIMEOUT 1000 /*ms*/
 
-namespace detail
+namespace
 {
-static const std::string empty_;
+static const std::string _empty;
 typedef std::map<std::string, std::string> ValueMap;
 typedef std::map<std::string, ValueMap> InstanceMap;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
 typedef std::unordered_set<Listener*> Listeners;
+}
 
-class Servus
+class Servus::Impl
 {
 public:
-    explicit Servus(const std::string& name)
+    explicit Impl(const std::string& name)
         : _name(name)
     {
     }
-    virtual ~Servus() {}
+    virtual ~Impl() {}
     virtual std::string getClassName() const = 0;
 
     const std::string& getName() const { return _name; }
@@ -76,7 +77,7 @@ public:
         ValueMapCIter i = _data.find(key);
         if (i != _data.end())
             return i->second;
-        return empty_;
+        return _empty;
     }
 
     virtual servus::Servus::Result announce(const unsigned short port,
@@ -135,12 +136,12 @@ public:
     {
         InstanceMapCIter i = _instanceMap.find(instance);
         if (i == _instanceMap.end())
-            return detail::empty_;
+            return _empty;
 
         const ValueMap& values = i->second;
         ValueMapCIter j = values.find(key);
         if (j == values.end())
-            return detail::empty_;
+            return _empty;
         return j->second;
     }
 
@@ -165,7 +166,6 @@ protected:
 
     virtual void _updateRecord() = 0;
 };
-}
 }
 
 // Impls need detail interface definition above
@@ -199,7 +199,6 @@ Servus::Servus(const std::string& name)
 
 Servus::~Servus()
 {
-    delete _impl;
 }
 
 const std::string& Servus::getName() const

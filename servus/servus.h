@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015, Human Brain Project
+/* Copyright (c) 2012-2017, Human Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -25,14 +25,10 @@
 #include <servus/types.h>
 
 #include <map>
+#include <memory>
 
 namespace servus
 {
-namespace detail
-{
-class Servus;
-}
-
 /**
  * Simple wrapper for ZeroConf key/value pairs.
  *
@@ -207,10 +203,14 @@ public:
     /** @internal */
     SERVUS_API void getData(Data& data);
 
+    class Impl; //!< @internal
+
 private:
-    Servus(const Servus&);
-    Servus& operator=(const Servus&);
-    detail::Servus* const _impl;
+    Servus(const Servus&) = delete;
+    Servus& operator=(const Servus&) = delete;
+
+    std::unique_ptr<Impl> _impl;
+
     friend SERVUS_API std::ostream& operator<<(std::ostream&, const Servus&);
 };
 

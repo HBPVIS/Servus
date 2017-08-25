@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2017, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -32,11 +32,11 @@ namespace servus
 {
 namespace dnssd
 {
-class Servus : public detail::Servus
+class Servus : public Servus::Impl
 {
 public:
     explicit Servus(const std::string& name)
-        : detail::Servus(name)
+        : Servus::Impl(name)
         , _out(0)
         , _in(0)
         , _result(servus::Servus::Result::PENDING)
@@ -164,10 +164,10 @@ private:
     void _createTXTRecord(TXTRecordRef& record)
     {
         TXTRecordCreate(&record, 0, 0);
-        for (detail::ValueMapCIter i = _data.begin(); i != _data.end(); ++i)
+        for (const auto& i : _data)
         {
-            const std::string& key = i->first;
-            const std::string& value = i->second;
+            const std::string& key = i.first;
+            const std::string& value = i.second;
             const uint8_t valueSize =
                 value.length() > 255 ? 255 : uint8_t(value.length());
             TXTRecordSetValue(&record, key.c_str(), valueSize, value.c_str());
@@ -319,7 +319,7 @@ private:
 
     void resolveCB_(const char* host, uint16_t txtLen, const unsigned char* txt)
     {
-        detail::ValueMap& values = _instanceMap[_browsedName];
+        ValueMap& values = _instanceMap[_browsedName];
         values["servus_host"] = host;
 
         char key[256] = {0};
