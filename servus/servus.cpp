@@ -175,30 +175,40 @@ protected:
 #include "avahi/servus.h"
 #endif
 #include "none/servus.h"
+#include "test/servus.h"
 
 namespace servus
 {
+namespace
+{
+std::unique_ptr<Servus::Impl> _chooseImplementation(const std::string& name)
+{
+    if (name == TEST_DRIVER)
+        return std::unique_ptr<Servus::Impl>(new test::Servus);
+#ifdef SERVUS_USE_DNSSD
+    return std::unique_ptr<Servus::Impl>(new dnssd::Servus(name));
+#elif defined(SERVUS_USE_AVAHI_CLIENT)
+    return std::unique_ptr<Servus::Impl>(new avahi::Servus(name));
+#endif
+    return std::unique_ptr<Servus::Impl>(new none::Servus(name));
+}
+}
+
+Servus::Servus(const std::string& name)
+    : _impl(_chooseImplementation(name))
+{
+}
+
+Servus::~Servus()
+{
+}
+
 bool Servus::isAvailable()
 {
 #if defined(SERVUS_USE_DNSSD) || defined(SERVUS_USE_AVAHI_CLIENT)
     return true;
 #endif
     return false;
-}
-
-Servus::Servus(const std::string& name)
-#ifdef SERVUS_USE_DNSSD
-    : _impl(new dnssd::Servus(name))
-#elif defined(SERVUS_USE_AVAHI_CLIENT)
-    : _impl(new avahi::Servus(name))
-#else
-    : _impl(new none::Servus(name))
-#endif
-{
-}
-
-Servus::~Servus()
-{
 }
 
 const std::string& Servus::getName() const

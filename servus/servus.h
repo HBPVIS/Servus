@@ -29,6 +29,11 @@
 
 namespace servus
 {
+/** Service name to be used by unit tests. All Servus instances with this name
+ * "communicate" through global data, that is, announced key-value pairs are
+ * communicated to all browsing instances in the same process. */
+static const std::string TEST_DRIVER{"_servus._test"};
+
 /**
  * Simple wrapper for ZeroConf key/value pairs.
  *

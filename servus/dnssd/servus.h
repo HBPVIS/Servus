@@ -32,7 +32,7 @@ namespace servus
 {
 namespace dnssd
 {
-class Servus : public Servus::Impl
+class Servus : public servus::Servus::Impl
 {
 public:
     explicit Servus(const std::string& name)
