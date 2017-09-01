@@ -109,20 +109,6 @@ public:
     }
 
     bool isBrowsing() const final { return _in != 0; }
-    Strings discover(const ::servus::Servus::Interface addr,
-                     const unsigned browseTime) final
-    {
-        const servus::Servus::Result& result = beginBrowsing(addr);
-        if (!result && result != kDNSServiceErr_AlreadyRegistered)
-            return getInstances();
-
-        assert(_in);
-        browse(browseTime);
-        if (result != kDNSServiceErr_AlreadyRegistered)
-            endBrowsing();
-        return getInstances();
-    }
-
 private:
     DNSServiceRef _out; //!< used for announce()
     DNSServiceRef _in;  //!< used to browse()

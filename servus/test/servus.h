@@ -133,19 +133,6 @@ public:
     }
 
     bool isBrowsing() const final { return _browsing; }
-    Strings discover(const ::servus::Servus::Interface addr,
-                     const unsigned browseTime) final
-    {
-        const servus::Servus::Result& result = beginBrowsing(addr);
-        if (!result && result != servus::Servus::Result::PENDING)
-            return getInstances();
-
-        browse(browseTime);
-        if (result != servus::Servus::Result::PENDING)
-            endBrowsing();
-        return getInstances();
-    }
-
 private:
     std::string _instance;
     unsigned short _port{0};

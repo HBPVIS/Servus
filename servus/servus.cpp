@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2012-2016, Stefan Eilemann <eile@eyescale.ch>
+/* Copyright (c) 2012-2017, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -91,17 +91,26 @@ public:
 
     virtual void endBrowsing() = 0;
     virtual bool isBrowsing() const = 0;
-    virtual Strings discover(const servus::Servus::Interface interface_,
-                             const unsigned browseTime) = 0;
+
+    Strings discover(const ::servus::Servus::Interface addr,
+                     const unsigned browseTime)
+    {
+        const auto& res = beginBrowsing(addr);
+        if (res == Servus::Result::SUCCESS || res == Servus::Result::PENDING)
+        {
+            browse(browseTime);
+            if (res == Servus::Result::SUCCESS)
+                endBrowsing();
+        }
+        return getInstances();
+    }
 
     Strings getInstances() const
     {
         Strings instances;
-        for (InstanceMapCIter i = _instanceMap.begin(); i != _instanceMap.end();
-             ++i)
-        {
-            instances.push_back(i->first);
-        }
+        for (auto i : _instanceMap)
+            instances.push_back(i.first);
+
         return instances;
     }
 
@@ -112,9 +121,8 @@ public:
         if (i == _instanceMap.end())
             return keys;
 
-        const ValueMap& values = i->second;
-        for (ValueMapCIter j = values.begin(); j != values.end(); ++j)
-            keys.push_back(j->first);
+        for (auto j : i->second)
+            keys.push_back(j.first);
         return keys;
     }
 

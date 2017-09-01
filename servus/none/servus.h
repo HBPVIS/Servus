@@ -49,11 +49,6 @@ public:
 
     void endBrowsing() final {}
     bool isBrowsing() const final { return false; }
-    Strings discover(const servus::Servus::Interface, const unsigned) final
-    {
-        return getInstances();
-    }
-
     void _updateRecord() final {}
 };
 }

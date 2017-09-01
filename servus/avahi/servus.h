@@ -204,20 +204,6 @@ public:
     }
 
     bool isBrowsing() const final { return _browser; }
-    Strings discover(const ::servus::Servus::Interface addr,
-                     const unsigned browseTime) final
-    {
-        const servus::Servus::Result& result = beginBrowsing(addr);
-        if (!result && result != servus::Servus::Result::PENDING)
-            return getInstances();
-
-        assert(_browser);
-        browse(browseTime);
-        if (result != servus::Servus::Result::PENDING)
-            endBrowsing();
-        return getInstances();
-    }
-
 private:
     AvahiSimplePoll* const _poll;
     AvahiClient* _client;
