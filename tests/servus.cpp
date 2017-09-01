@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2012-2017, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -20,6 +20,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include <servus/servus.h>
+#include <servus/uint128_t.h>
 
 #include <random>
 
@@ -37,6 +38,8 @@
 static const int _propagationTime = 1000;
 static const int _propagationTries = 10;
 
+namespace
+{
 uint16_t getRandomPort()
 {
     static std::random_device device;
@@ -45,10 +48,9 @@ uint16_t getRandomPort()
     return generator(engine);
 }
 
-BOOST_AUTO_TEST_CASE(test_servus)
+void test(const std::string& serviceName)
 {
     const uint32_t port = getRandomPort();
-    std::string serviceName = "_servustest_" + std::to_string(port) + "._tcp";
 
     try
     {
@@ -194,4 +196,17 @@ BOOST_AUTO_TEST_CASE(test_servus)
     BOOST_REQUIRE_EQUAL(hosts.size(), 1);
     BOOST_CHECK_EQUAL(service.get(hosts.front(), "foo"), "bar");
     BOOST_CHECK_EQUAL(service.getKeys().size(), 2);
+}
+}
+
+BOOST_AUTO_TEST_CASE(test_servus)
+{
+    std::string serviceName =
+        "_servustest_" + std::to_string(servus::make_UUID()) + "._tcp";
+    test(serviceName);
+}
+
+BOOST_AUTO_TEST_CASE(test_driver)
+{
+    test(servus::TEST_DRIVER);
 }

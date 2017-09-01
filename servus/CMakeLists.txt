@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2016, Human Brain Project
+# Copyright (c) 2015-2017, Human Brain Project
 #                          Juan Hernando <jhernando@fi.upm.es>
 #
 # This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -30,6 +30,7 @@ set(SERVUS_HEADERS
   avahi/servus.h
   dnssd/servus.h
   none/servus.h
+  test/servus.h
   )
 
 set(SERVUS_SOURCES

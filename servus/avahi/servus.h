@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2016, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2017, Stefan.Eilemann@epfl.ch
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -62,11 +62,11 @@ AvahiSimplePoll* _newSimplePoll()
 }
 }
 
-class Servus : public detail::Servus
+class Servus : public servus::Servus::Impl
 {
 public:
     explicit Servus(const std::string& name)
-        : detail::Servus(name)
+        : servus::Servus::Impl(name)
         , _poll(_newSimplePoll())
         , _client(0)
         , _browser(0)
@@ -204,20 +204,6 @@ public:
     }
 
     bool isBrowsing() const final { return _browser; }
-    Strings discover(const ::servus::Servus::Interface addr,
-                     const unsigned browseTime) final
-    {
-        const servus::Servus::Result& result = beginBrowsing(addr);
-        if (!result && result != servus::Servus::Result::PENDING)
-            return getInstances();
-
-        assert(_browser);
-        browse(browseTime);
-        if (result != servus::Servus::Result::PENDING)
-            endBrowsing();
-        return getInstances();
-    }
-
 private:
     AvahiSimplePoll* const _poll;
     AvahiClient* _client;
@@ -312,11 +298,9 @@ private:
 
         case AVAHI_BROWSER_REMOVE:
             _instanceMap.erase(name);
-            for (detail::Listeners::iterator i = _listeners.begin();
-                 i != _listeners.end(); ++i)
-            {
-                (*i)->instanceRemoved(name);
-            }
+            for (Listener* listener : _listeners)
+                listener->instanceRemoved(name);
+
             break;
 
         case AVAHI_BROWSER_ALL_FOR_NOW:
@@ -356,7 +340,7 @@ private:
 
         case AVAHI_RESOLVER_FOUND:
         {
-            detail::ValueMap& values = _instanceMap[name];
+            ValueMap& values = _instanceMap[name];
             values["servus_host"] = host;
             for (; txt; txt = txt->next)
             {
@@ -368,11 +352,8 @@ private:
                 const std::string value = entry.substr(pos + 1);
                 values[key] = value;
             }
-            for (detail::Listeners::iterator i = _listeners.begin();
-                 i != _listeners.end(); ++i)
-            {
-                (*i)->instanceAdded(name);
-            }
+            for (Listener* listener : _listeners)
+                listener->instanceAdded(name);
         }
         break;
         }
@@ -401,9 +382,9 @@ private:
             return;
 
         AvahiStringList* data = 0;
-        for (detail::ValueMapCIter i = _data.begin(); i != _data.end(); ++i)
-            data = avahi_string_list_add_pair(data, i->first.c_str(),
-                                              i->second.c_str());
+        for (const auto& i : _data)
+            data = avahi_string_list_add_pair(data, i.first.c_str(),
+                                              i.second.c_str());
 
         _result = avahi_entry_group_add_service_strlst(
             _group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)(0),

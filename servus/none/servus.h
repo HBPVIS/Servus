@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2014-2017, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -20,11 +20,11 @@ namespace servus
 {
 namespace none
 {
-class Servus : public detail::Servus
+class Servus : public servus::Servus::Impl
 {
 public:
     explicit Servus(const std::string& name)
-        : detail::Servus(name)
+        : servus::Servus::Impl(name)
     {
     }
     virtual ~Servus() {}
@@ -49,11 +49,6 @@ public:
 
     void endBrowsing() final {}
     bool isBrowsing() const final { return false; }
-    Strings discover(const servus::Servus::Interface, const unsigned) final
-    {
-        return getInstances();
-    }
-
     void _updateRecord() final {}
 };
 }

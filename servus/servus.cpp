@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2012-2016, Stefan Eilemann <eile@eyescale.ch>
+/* Copyright (c) 2012-2017, Stefan Eilemann <eile@eyescale.ch>
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -37,23 +37,24 @@ namespace servus
 {
 #define ANNOUNCE_TIMEOUT 1000 /*ms*/
 
-namespace detail
+namespace
 {
-static const std::string empty_;
+static const std::string _empty;
 typedef std::map<std::string, std::string> ValueMap;
 typedef std::map<std::string, ValueMap> InstanceMap;
 typedef ValueMap::const_iterator ValueMapCIter;
 typedef InstanceMap::const_iterator InstanceMapCIter;
 typedef std::unordered_set<Listener*> Listeners;
+}
 
-class Servus
+class Servus::Impl
 {
 public:
-    explicit Servus(const std::string& name)
+    explicit Impl(const std::string& name)
         : _name(name)
     {
     }
-    virtual ~Servus() {}
+    virtual ~Impl() {}
     virtual std::string getClassName() const = 0;
 
     const std::string& getName() const { return _name; }
@@ -76,7 +77,7 @@ public:
         ValueMapCIter i = _data.find(key);
         if (i != _data.end())
             return i->second;
-        return empty_;
+        return _empty;
     }
 
     virtual servus::Servus::Result announce(const unsigned short port,
@@ -90,17 +91,26 @@ public:
 
     virtual void endBrowsing() = 0;
     virtual bool isBrowsing() const = 0;
-    virtual Strings discover(const servus::Servus::Interface interface_,
-                             const unsigned browseTime) = 0;
+
+    Strings discover(const ::servus::Servus::Interface addr,
+                     const unsigned browseTime)
+    {
+        const auto& res = beginBrowsing(addr);
+        if (res == Servus::Result::SUCCESS || res == Servus::Result::PENDING)
+        {
+            browse(browseTime);
+            if (res == Servus::Result::SUCCESS)
+                endBrowsing();
+        }
+        return getInstances();
+    }
 
     Strings getInstances() const
     {
         Strings instances;
-        for (InstanceMapCIter i = _instanceMap.begin(); i != _instanceMap.end();
-             ++i)
-        {
-            instances.push_back(i->first);
-        }
+        for (auto i : _instanceMap)
+            instances.push_back(i.first);
+
         return instances;
     }
 
@@ -111,9 +121,8 @@ public:
         if (i == _instanceMap.end())
             return keys;
 
-        const ValueMap& values = i->second;
-        for (ValueMapCIter j = values.begin(); j != values.end(); ++j)
-            keys.push_back(j->first);
+        for (auto j : i->second)
+            keys.push_back(j.first);
         return keys;
     }
 
@@ -135,12 +144,12 @@ public:
     {
         InstanceMapCIter i = _instanceMap.find(instance);
         if (i == _instanceMap.end())
-            return detail::empty_;
+            return _empty;
 
         const ValueMap& values = i->second;
         ValueMapCIter j = values.find(key);
         if (j == values.end())
-            return detail::empty_;
+            return _empty;
         return j->second;
     }
 
@@ -166,7 +175,6 @@ protected:
     virtual void _updateRecord() = 0;
 };
 }
-}
 
 // Impls need detail interface definition above
 #ifdef SERVUS_USE_DNSSD
@@ -175,31 +183,40 @@ protected:
 #include "avahi/servus.h"
 #endif
 #include "none/servus.h"
+#include "test/servus.h"
 
 namespace servus
 {
+namespace
+{
+std::unique_ptr<Servus::Impl> _chooseImplementation(const std::string& name)
+{
+    if (name == TEST_DRIVER)
+        return std::unique_ptr<Servus::Impl>(new test::Servus);
+#ifdef SERVUS_USE_DNSSD
+    return std::unique_ptr<Servus::Impl>(new dnssd::Servus(name));
+#elif defined(SERVUS_USE_AVAHI_CLIENT)
+    return std::unique_ptr<Servus::Impl>(new avahi::Servus(name));
+#endif
+    return std::unique_ptr<Servus::Impl>(new none::Servus(name));
+}
+}
+
+Servus::Servus(const std::string& name)
+    : _impl(_chooseImplementation(name))
+{
+}
+
+Servus::~Servus()
+{
+}
+
 bool Servus::isAvailable()
 {
 #if defined(SERVUS_USE_DNSSD) || defined(SERVUS_USE_AVAHI_CLIENT)
     return true;
 #endif
     return false;
-}
-
-Servus::Servus(const std::string& name)
-#ifdef SERVUS_USE_DNSSD
-    : _impl(new dnssd::Servus(name))
-#elif defined(SERVUS_USE_AVAHI_CLIENT)
-    : _impl(new avahi::Servus(name))
-#else
-    : _impl(new none::Servus(name))
-#endif
-{
-}
-
-Servus::~Servus()
-{
-    delete _impl;
 }
 
 const std::string& Servus::getName() const

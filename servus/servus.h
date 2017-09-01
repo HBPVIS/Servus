@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015, Human Brain Project
+/* Copyright (c) 2012-2017, Human Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
@@ -25,13 +25,14 @@
 #include <servus/types.h>
 
 #include <map>
+#include <memory>
 
 namespace servus
 {
-namespace detail
-{
-class Servus;
-}
+/** Service name to be used by unit tests. All Servus instances with this name
+ * "communicate" through global data, that is, announced key-value pairs are
+ * communicated to all browsing instances in the same process. */
+static const std::string TEST_DRIVER{"_servus._test"};
 
 /**
  * Simple wrapper for ZeroConf key/value pairs.
@@ -207,10 +208,14 @@ public:
     /** @internal */
     SERVUS_API void getData(Data& data);
 
+    class Impl; //!< @internal
+
 private:
-    Servus(const Servus&);
-    Servus& operator=(const Servus&);
-    detail::Servus* const _impl;
+    Servus(const Servus&) = delete;
+    Servus& operator=(const Servus&) = delete;
+
+    std::unique_ptr<Impl> _impl;
+
     friend SERVUS_API std::ostream& operator<<(std::ostream&, const Servus&);
 };
 
