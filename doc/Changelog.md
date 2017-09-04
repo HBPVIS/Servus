@@ -3,8 +3,10 @@
 
 # git master
 
+* [77](https://github.com/HBPVis/Servus/pull/77):
+  Add test driver implementation for Servus
 * [76](https://github.com/HBPVis/Servus/pull/76):
-  Add Serializable::Data::clone() 
+  Add Serializable::Data::clone()
 
 # Release 1.5.1 (22-05-2017)
 
