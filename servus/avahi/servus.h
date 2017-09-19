@@ -293,8 +293,8 @@ private:
                 WARN << "Error creating resolver: " << avahi_strerror(_result)
                      << std::endl;
                 avahi_simple_poll_quit(_poll);
-                break;
             }
+            break;
 
         case AVAHI_BROWSER_REMOVE:
             _instanceMap.erase(name);
