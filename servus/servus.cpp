@@ -193,12 +193,21 @@ std::unique_ptr<Servus::Impl> _chooseImplementation(const std::string& name)
 {
     if (name == TEST_DRIVER)
         return std::unique_ptr<Servus::Impl>(new test::Servus);
+    try
+    {
 #ifdef SERVUS_USE_DNSSD
-    return std::unique_ptr<Servus::Impl>(new dnssd::Servus(name));
+        return std::unique_ptr<Servus::Impl>(new dnssd::Servus(name));
 #elif defined(SERVUS_USE_AVAHI_CLIENT)
-    return std::unique_ptr<Servus::Impl>(new avahi::Servus(name));
+        return std::unique_ptr<Servus::Impl>(new avahi::Servus(name));
 #endif
-    return std::unique_ptr<Servus::Impl>(new none::Servus(name));
+        return std::unique_ptr<Servus::Impl>(new none::Servus(name));
+    }
+    catch (const std::runtime_error& error)
+    {
+        std::cerr << "Error starting Servus client: " << error.what()
+                  << std::endl;
+        return std::unique_ptr<Servus::Impl>(new servus::none::Servus(name));
+    }
 }
 }
 

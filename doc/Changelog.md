@@ -3,6 +3,8 @@
 
 # git master
 
+* [80](https://github.com/HBPVis/Servus/pull/80):
+  Failsafe when Servus implementation can't be created and fallback to dummy.
 * [77](https://github.com/HBPVis/Servus/pull/77):
   Add test driver implementation for Servus
 * [76](https://github.com/HBPVis/Servus/pull/76):
