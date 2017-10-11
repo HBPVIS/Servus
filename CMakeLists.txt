@@ -56,7 +56,7 @@ add_subdirectory(apps)
 add_subdirectory(tests)
 
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
-set(SERVUS_DEBIAN_PACKAGE_DEPENDS)
+set(SERVUS_PACKAGE_DEB_DEPENDS)
 if (avahi-client_FOUND)
   list(APPEND SERVUS_PACKAGE_DEB_DEPENDS libavahi-client3 avahi-daemon)
 endif()
