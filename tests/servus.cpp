@@ -120,6 +120,9 @@ void test(const std::string& serviceName)
         BOOST_REQUIRE_EQUAL(hosts.size(), 1);
         BOOST_CHECK_EQUAL(hosts.front(), std::to_string(port));
         BOOST_CHECK(service.containsKey(hosts.front(), "foo"));
+        BOOST_CHECK(service.containsKey(hosts.front(), "servus_host"));
+        BOOST_CHECK_EQUAL(service.get(hosts.front(), "servus_port"),
+                          std::to_string(unsigned(port)));
         BOOST_CHECK_EQUAL(service.get(hosts.front(), "foo"), "bar");
         BOOST_CHECK_EQUAL(service.get("bar", "foo"), std::string());
         BOOST_CHECK_EQUAL(service.get(hosts.front(), "foobar"), std::string());

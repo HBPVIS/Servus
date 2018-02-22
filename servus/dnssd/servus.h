@@ -294,19 +294,21 @@ private:
     static void resolveCBS_(DNSServiceRef, DNSServiceFlags,
                             uint32_t /*interfaceIdx*/,
                             DNSServiceErrorType error, const char* /*name*/,
-                            const char* host, uint16_t /*port*/,
+                            const char* host, const uint16_t port,
                             uint16_t txtLen, const unsigned char* txt,
                             Servus* servus)
     {
         if (error == kDNSServiceErr_NoError)
-            servus->resolveCB_(host, txtLen, txt);
+            servus->resolveCB_(host, port, txtLen, txt);
         servus->_result = error;
     }
 
-    void resolveCB_(const char* host, uint16_t txtLen, const unsigned char* txt)
+    void resolveCB_(const char* host, const uint16_t port, uint16_t txtLen,
+                    const unsigned char* txt)
     {
         ValueMap& values = _instanceMap[_browsedName];
         values["servus_host"] = host;
+        values["servus_port"] = std::to_string(unsigned(ntohs(port)));
 
         char key[256] = {0};
         const char* value = 0;

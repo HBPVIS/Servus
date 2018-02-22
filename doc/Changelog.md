@@ -3,6 +3,8 @@
 
 # git master
 
+* [82](https://github.com/HBPVis/Servus/pull/20):
+  Expose servus_host and servus_port keys.
 * [80](https://github.com/HBPVis/Servus/pull/80):
   Failsafe when Servus implementation can't be created and fallback to dummy.
 * [77](https://github.com/HBPVis/Servus/pull/77):

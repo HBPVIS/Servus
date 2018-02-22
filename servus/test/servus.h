@@ -103,6 +103,7 @@ public:
             ValueMap& values = _instanceMap[i->_instance];
             values.clear();
             values["servus_host"] = "localhost";
+            values["servus_port"] = std::to_string(unsigned(_port));
 
             for (const auto& j : i->_data)
                 values[j.first] = j.second;
