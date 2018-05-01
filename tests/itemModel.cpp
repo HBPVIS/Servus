@@ -102,7 +102,11 @@ public:
     {
     }
 
-    void instanceAdded(const std::string&) final {}
+    void instanceAdded(const std::string& instance) final
+    {
+        BOOST_CHECK_EQUAL(instance, TEST_INSTANCE);
+    }
+
     void instanceRemoved(const std::string& instance) final
     {
         BOOST_CHECK_EQUAL(instance, TEST_INSTANCE);
@@ -114,10 +118,7 @@ BOOST_GLOBAL_FIXTURE(GlobalQtApp);
 
 BOOST_AUTO_TEST_CASE(invalidAccess)
 {
-    const std::string serviceName =
-        "_servustest_" + servus::make_UUID().getString() + "._tcp";
-
-    servus::Servus service(serviceName);
+    servus::Servus service(servus::TEST_DRIVER);
     const servus::qt::ItemModel model(service);
 
     const QVariant invalidHeader =
@@ -131,10 +132,7 @@ BOOST_AUTO_TEST_CASE(invalidAccess)
 
 BOOST_AUTO_TEST_CASE(servusItemModel)
 {
-    const std::string serviceName =
-        "_servustest_" + servus::make_UUID().getString() + "._tcp";
-
-    servus::Servus service(serviceName);
+    servus::Servus service(servus::TEST_DRIVER);
     const servus::qt::ItemModel model(service);
 
     WatchAdd watchAdd;
@@ -146,10 +144,10 @@ BOOST_AUTO_TEST_CASE(servusItemModel)
         model.headerData(0, Qt::Horizontal, Qt::DisplayRole)
             .toString()
             .toStdString();
-    BOOST_CHECK_EQUAL(header, "Instances for " + serviceName);
+    BOOST_CHECK_EQUAL(header, "Instances for " + servus::TEST_DRIVER);
     BOOST_CHECK(model.data(QModelIndex()) == QVariant());
 
-    servus::Servus service2(serviceName);
+    servus::Servus service2(servus::TEST_DRIVER);
     const servus::Servus::Result& result = service2.announce(0, TEST_INSTANCE);
     if (result != servus::Result::SUCCESS) // happens on CI VMs
     {
@@ -178,15 +176,17 @@ BOOST_AUTO_TEST_CASE(servusItemModel)
         model.data(instanceIndex, Qt::UserRole).toString().toStdString(),
         service.get(TEST_INSTANCE, "servus_host"));
     BOOST_CHECK(model.data(instanceIndex, Qt::EditRole) == QVariant());
-    BOOST_REQUIRE_EQUAL(model.rowCount(instanceIndex), 2);
+    BOOST_REQUIRE_EQUAL(model.rowCount(instanceIndex), 3);
     const QModelIndex kv1Index = model.index(0, 0, instanceIndex);
     BOOST_CHECK(model.parent(kv1Index) == instanceIndex);
     BOOST_CHECK(model.data(kv1Index, Qt::UserRole) == QVariant());
     const QVariant kv1 = model.data(kv1Index);
     const QVariant kv2 = model.data(model.index(1, 0, instanceIndex));
+    const QVariant kv3 = model.data(model.index(2, 0, instanceIndex));
     BOOST_REQUIRE_EQUAL(model.rowCount(kv1Index), 0);
     BOOST_CHECK_EQUAL(kv1.toString().toStdString(), "foo = bar");
     BOOST_CHECK(kv2.toString().startsWith("servus_host = "));
+    BOOST_CHECK(kv3.toString().startsWith("servus_port = "));
 
     WatchRemove watchRemove;
     service.addListener(&watchRemove);

@@ -1,4 +1,4 @@
-/* Copyright (c) 2017, Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2017-2018, Stefan.Eilemann@epfl.ch
  *
  * This file is part of Servus <https://github.com/HBPVIS/Servus>
  *
@@ -18,7 +18,7 @@
 
 #include <algorithm>
 #include <mutex>
-#include <set>
+#include <unordered_map>
 
 namespace servus
 {
@@ -31,7 +31,7 @@ namespace
 struct
 {
     std::mutex mutex;
-    std::set<Servus*> instances;
+    std::unordered_map<Servus*, std::string> instances;
 } _directory;
 }
 
@@ -60,7 +60,7 @@ public:
             _instance = getHostname();
         else
             _instance = instance;
-        _directory.instances.insert(this);
+        _directory.instances[this] = _instance;
         _announced = true;
         return servus::Servus::Result(servus::Result::SUCCESS);
     }
@@ -91,7 +91,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(_directory.mutex);
 
-        std::vector<Servus*> diff;
+        std::vector<std::pair<Servus*, std::string>> diff;
         std::set_symmetric_difference(_directory.instances.begin(),
                                       _directory.instances.end(),
                                       _instances.begin(), _instances.end(),
@@ -100,27 +100,28 @@ public:
         _instanceMap.clear();
         for (auto i : _directory.instances)
         {
-            ValueMap& values = _instanceMap[i->_instance];
+            ValueMap& values = _instanceMap[i.second];
             values.clear();
             values["servus_host"] = "localhost";
+            values["servus_port"] = std::to_string(unsigned(_port));
 
-            for (const auto& j : i->_data)
+            for (const auto& j : i.first->_data)
                 values[j.first] = j.second;
         }
 
         for (auto i : diff)
         {
-            if (_instances.count(i) == 0)
+            if (_instances.count(i.first) == 0)
             {
-                _instances.insert(i);
+                _instances[i.first] = i.second;
                 for (Listener* listener : _listeners)
-                    listener->instanceAdded(i->_instance);
+                    listener->instanceAdded(i.second);
             }
             else
             {
                 for (Listener* listener : _listeners)
-                    listener->instanceRemoved(i->_instance);
-                _instances.erase(i);
+                    listener->instanceRemoved(i.second);
+                _instances.erase(i.first);
             }
         }
         return servus::Servus::Result(servus::Servus::Result::SUCCESS);
@@ -139,7 +140,7 @@ private:
     bool _announced{false};
     bool _browsing{false};
 
-    std::set<Servus*> _instances;
+    std::unordered_map<Servus*, std::string> _instances;
 
     void _updateRecord() final { /*nop*/}
 };

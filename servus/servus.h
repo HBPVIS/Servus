@@ -42,6 +42,9 @@ static const std::string TEST_DRIVER{"_servus._test"};
  * to browse a ZeroConf service. If the Servus library is compiled without
  * zeroconf support (@sa isAvailable()), this class does not do anything useful.
  *
+ * The keys 'servus_host' and 'servus_port' are set for discovered instances to
+ * the values of the implementation-specific dnssd hostname and port.
+ *
  * Example: @include tests/servus.cpp
  */
 class Servus
