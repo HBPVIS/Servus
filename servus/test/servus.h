@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <mutex>
 #include <set>
+#include <iterator>
 
 namespace servus
 {
