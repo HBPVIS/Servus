@@ -1,7 +1,7 @@
 
 # Changelog {#Changelog}
 
-# git master
+# Release 1.5.2 (20-03-2017)
 
 * [80](https://github.com/HBPVis/Servus/pull/80):
   Failsafe when Servus implementation can't be created and fallback to dummy.
