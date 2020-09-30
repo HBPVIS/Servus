@@ -77,7 +77,16 @@ public:
 
     /**
      * Construct a new 128 bit integer with default values.
-     **/
+     */
+    uint128_t(const servus::uint128_t& rhs)
+        : _high(rhs._high)
+        , _low(rhs._low)
+    {
+    }
+
+    /**
+     * Construct a new 128 bit integer with default values.
+     */
     uint128_t(const uint64_t high_, const uint64_t low_)
         : _high(high_)
         , _low(low_)
@@ -86,7 +95,7 @@ public:
 
     /**
      * Construct a new 128 bit integer from a string representation.
-     **/
+     */
     explicit uint128_t(const std::string& string)
         : _high(0)
         , _low(0)
