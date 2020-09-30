@@ -1,4 +1,4 @@
-[TOC]
+[TOC]  */ An Amazing article /*
 
 # Introduction
 
