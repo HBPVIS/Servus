@@ -23,6 +23,7 @@
 #include <servus/api.h>
 #include <servus/types.h>
 
+#include <stdexcept>  // runtime_error
 #include <functional> // function
 #include <memory>     // shared_ptr
 
