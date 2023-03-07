@@ -369,6 +369,19 @@ const std::string& Servus::getHost(const std::string& instance) const
     return get(instance, "servus_host");
 }
 
+uint16_t Servus::getPort(const std::string& instance) const
+{
+  std::string sport = get(instance, "servus_port");
+  try {
+    const int port = std::stoi (sport);
+    if (port < 0 || port > 0xFFFF)
+      return 0;
+    return static_cast<uint16_t>(port);
+  } catch (const std::exception&) {
+    return 0;
+  }
+}
+
 bool Servus::containsKey(const std::string& instance,
                          const std::string& key) const
 {

@@ -178,6 +178,9 @@ public:
     /** @return the host corresponding to the given instance. @version 1.3 */
     SERVUS_API const std::string& getHost(const std::string& instance) const;
 
+    /** @return the port corresponding to the given instance. @version 1.6 */
+    SERVUS_API uint16_t getPort(const std::string& instance) const;
+
     /** @return true if the given key was discovered. @version 1.1 */
     SERVUS_API bool containsKey(const std::string& instance,
                                 const std::string& key) const;
