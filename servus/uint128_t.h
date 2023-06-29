@@ -22,6 +22,7 @@
 #define SERVUS_UINT128_H
 
 #include <servus/api.h>
+#include <servus/serializable.h>
 #include <servus/types.h>
 
 #include <sstream>
@@ -45,14 +46,15 @@ std::ostream& operator<<(std::ostream& os, const uint128_t& id);
  *
  * Example: @include tests/uint128_t.cpp
  */
-class uint128_t
+class uint128_t : public Serializable
 {
 public:
     /**
      * Construct a new 128 bit integer with a default value.
      */
     explicit uint128_t(const unsigned long long low_ = 0)
-        : _high(0)
+        : Serializable()
+        , _high(0)
         , _low(low_)
     {
     }
@@ -61,7 +63,8 @@ public:
      * Construct a new 128 bit integer with a default value.
      */
     explicit uint128_t(const unsigned long low_)
-        : _high(0)
+        : Serializable()
+        , _high(0)
         , _low(low_)
     {
     }
@@ -70,14 +73,25 @@ public:
      * Construct a new 128 bit integer with a default value.
      */
     explicit uint128_t(const int low_)
-        : _high(0)
+        : Serializable()
+        , _high(0)
         , _low(low_)
     {
     }
 
     /**
      * Construct a new 128 bit integer with default values.
-     **/
+     */
+    uint128_t(const servus::uint128_t& rhs)
+        : Serializable()
+        , _high(rhs._high)
+        , _low(rhs._low)
+    {
+    }
+
+    /**
+     * Construct a new 128 bit integer with default values.
+     */
     uint128_t(const uint64_t high_, const uint64_t low_)
         : _high(high_)
         , _low(low_)
@@ -86,7 +100,7 @@ public:
 
     /**
      * Construct a new 128 bit integer from a string representation.
-     **/
+     */
     explicit uint128_t(const std::string& string)
         : _high(0)
         , _low(0)
@@ -274,6 +288,8 @@ public:
         ar& high();
     }
 
+    virtual std::string getTypeName() const { return "servus::uint128_t"; }
+
 private:
     uint64_t _high;
     uint64_t _low;
@@ -367,7 +383,7 @@ inline uint128_t make_uint128(const std::string& string)
  * identifier.
  */
 SERVUS_API uint128_t make_UUID();
-}
+} // namespace servus
 
 namespace std
 {
@@ -387,6 +403,6 @@ inline string to_string(const servus::uint128_t& value)
 {
     return value.getString();
 }
-}
+} // namespace std
 
 #endif // SERVUS_UINT128_H
